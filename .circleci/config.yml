@@ -1,0 +1,19 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@0.2.1
+
+jobs:
+  build:
+    working_directory: /srv/hola    
+    steps:
+      - checkout
+      - run: python3 -m venv env
+      - run: source ./env/bin/activate
+      - run: pip install -e .
+      - run: sudo supervisorctl restart hola_api
+
+workflows:
+  main:
+    jobs:
+      - build
