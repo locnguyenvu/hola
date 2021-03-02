@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.6.9
-    working_directory: /home/circleci    
+    working_directory: /home/circleci/hola    
     steps:
       - checkout
       - run: python3 -m venv env
