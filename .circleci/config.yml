@@ -1,21 +1,19 @@
 version: 2.1
 
-orbs:
-  python: circleci/python@0.2.1
-
 jobs:
   build:
     docker:
-      - image: circleci/python:3.6.9
-    working_directory: /home/circleci/hola    
+      - image: arvindr226/alpine-ssh
     steps:
       - checkout
-      - run: python3 -m venv env
-      - run: . env/bin/activate
-      - run: pip install -e .
-      - run: sudo supervisorctl restart hola_api
+      - run: ssh -oStrictHostKeyChecking=no -v $USER@$HOST "$BUILD_COMMAND" 
 
 workflows:
+  version: 2
   main:
     jobs:
       - build
+	    filters:
+          branches:
+            only:
+              - main
