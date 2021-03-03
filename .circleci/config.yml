@@ -11,8 +11,7 @@ jobs:
     steps:
       - checkout
       - run: python3 -m venv env
-      - run: . env/bin/activate
-      - run: pip install -e .
+      - run: ./env/bin/pip install -e . 
       - run: sudo supervisorctl restart hola_api
 
 workflows:
