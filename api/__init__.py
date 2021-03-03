@@ -21,9 +21,10 @@ def create_app():
         from . import db
         db.init_app(app)
 
-        from . import auth 
+        from . import auth
         auth.init_app(app)
         app.register_blueprint(auth.bp)
+        app.cli.add_command(auth.cli)
 
         from . import user
         app.register_blueprint(user.bp)

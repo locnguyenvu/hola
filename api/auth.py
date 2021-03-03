@@ -1,9 +1,11 @@
 import re
 import os
+import click
+from flask.cli import AppGroup
 from base64 import b64encode
-from flask import Blueprint, make_response, abort, request, url_for
+from flask import Blueprint, make_response, abort, request, current_app
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_jwt_extended import JWTManager, create_access_token, get_current_user, jwt_required, current_user
+from flask_jwt_extended import JWTManager, create_access_token, get_current_user, jwt_required
 from .user import User
 
 jwt = JWTManager()
@@ -64,3 +66,21 @@ def login(session_alias):
 def me():
     user = get_current_user()
     return make_response({"status": "ok", "data": user})
+
+cli = AppGroup('auth')
+
+@cli.command('register')
+@click.argument('username')
+def cli_register_user(username):
+    user = User.find_by_telegram_account(username)
+    if user is None:
+        print(f'\n!Err: {username} does not exit\n')
+        return
+    pin = ''
+    while re.match('^\d{4}$', pin.strip()) is None:
+        pin = input('Pin (4 digits): ')
+
+    user.pin = generate_password_hash(pin)
+    user.save()
+    print(f'\nSuccess!\n')
+    
