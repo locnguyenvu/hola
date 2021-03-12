@@ -27,12 +27,12 @@ class SpendingLog(db.Model):
         db_session = get_db_session()
         db_session.add(self)
         db_session.save()
+
 def get_spending_log(from_date:datetime, to_date:datetime):
-    row_set = SpendingLog.query.filter(and_(
+    return SpendingLog.query.filter(and_(
         SpendingLog.created_at >= from_date,
         SpendingLog.created_at <= to_date
     )).all()
-    return list(map(lambda e: e.to_dict() , row_set))
 
 def find_spending_log(id:int) -> SpendingLog:
     return SpendingLog.query.filter_by(id=id).first()

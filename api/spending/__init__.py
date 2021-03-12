@@ -4,8 +4,8 @@ from .. import util
 
 """ Spending log """
 spending_log_bp = Blueprint('spending_log', __name__, url_prefix="/spending-log")
-
 from .spending_log import get_spending_log, update_spending_log
+
 @spending_log_bp.route("")
 @jwt_required()
 def spending_log_index():
@@ -18,24 +18,24 @@ def spending_log_index():
         timespan = (from_timespan[0], to_timespan[1],)
     if timespan is None or len(timespan) == 0:
         timespan = util.Datetime.get_time_range_from_text("today")
-    return make_response({"data": get_spending_log(*timespan)})
+    return make_response({"data": list(map(lambda e: e.to_dict(), get_spending_log(*timespan)))})
 
 @spending_log_bp.route("/<int:log_id>", methods=("POST",))
-@jwt_required
+@jwt_required()
 def spending_log_detail(log_id):
     if request.method == "POST":
         update_spending_log(spending_log_id, subject=subject, amount=amount, spending_method_id=spending_method_id)
 
 """ Spending category """
 spending_category_bp = Blueprint('spending_category', __name__, url_prefix="/spending-category")
-
 from .spending_category import get_all_spending_category, delete_spending_category, create_spending_category, update_spending_category
+
 @spending_category_bp.route("", methods=("GET", "POST"))
 @jwt_required()
 def spending_category_index():
     if request.method == "GET":
         return make_response({
-            "data": get_all_spending_category()
+            "data": list(map(lambda e: e.to_dict(), get_all_spending_category()))
         })
     elif request.method == "POST":
         params = request.get_json()
@@ -74,8 +74,7 @@ def edit_spending_category(category_id):
 
 """ Spending method """
 spending_method_bp = Blueprint('spending_method', __name__, url_prefix="/spending-method")
-
-from ..spending.spending_method import create_spending_method, find_spending_method, get_spending_methods
+from .spending_method import create_spending_method, find_spending_method, get_spending_methods
 
 @spending_method_bp.route("", methods=("GET", "POST"))
 @jwt_required()
@@ -89,4 +88,29 @@ def spending_method_index():
         )
         return make_response({"status": "ok", "data": spending_method})
     else:
-        return make_response({"status": "ok", "data": get_spending_methods()})
+        data = list(map(lambda e: e.to_dict(), get_spending_methods()))
+        return make_response({"status": "ok", "data": data})
+
+""" Spending tag """
+spending_tag_bp = Blueprint('spending_tag', __name__, url_prefix='/spending-tag')
+from .spending_tag import get_all_spending_tag, create_spending_tag, bulk_tag_logs
+
+@spending_tag_bp.route('', methods=('GET', 'POST'))
+@jwt_required()
+def spending_tag_index():
+    if request.method == 'GET':
+        data = list(map(lambda e: {'id': e.id, 'name': e.tag_name, 'created_at': e.created_at}, get_all_spending_tag()))
+        return make_response({'status': 'ok', 'data': data})
+    else:
+        params = request.get_json()
+        spending_tag = create_spending_tag(
+            tag_name=params.get('tag_name')
+        )
+        return make_response({'status': 'ok'})
+
+@spending_tag_bp.route('/tag-log', methods=('POST',))
+@jwt_required()
+def spending_tag_tag_log():
+    params = request.get_json()
+    bulk_tag_logs(params.get('tag_id'), params.get('log_ids'))
+    return make_response({'status': 'ok'})

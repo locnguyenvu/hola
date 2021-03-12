@@ -33,5 +33,6 @@ def create_app():
         app.register_blueprint(spending.spending_log_bp)
         app.register_blueprint(spending.spending_category_bp)
         app.register_blueprint(spending.spending_method_bp)
+        app.register_blueprint(spending.spending_tag_bp)
 
     return app

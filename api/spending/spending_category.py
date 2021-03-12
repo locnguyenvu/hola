@@ -25,8 +25,7 @@ class SpendingCategory(db.Model):
         db_session.commit()
 
 def get_all_spending_category() -> list:
-    row_set = SpendingCategory.query.all()
-    return list(map(lambda e: e.to_dict(), row_set))
+    return SpendingCategory.query.all()
 
 def delete_spending_category(category_id) -> bool:
     category = SpendingCategory.query.filter_by(id=category_id).first()
