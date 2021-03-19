@@ -15,20 +15,12 @@ class SpendingMethod(db.Model):
     type = db.Column(db.String, nullable=False)
     created_at = db.Column(db.DateTime)
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "alias": self.alias,
-            "type": self.type
-        }
-
     def save(self):
         db_session = get_db_session()
         db_session.add(self)
         db_session.commit()
 
-def create_spending_method(name:str, type:str, alias:str = None) -> dict:
+def create(name:str, type:str, alias:str = None) :
     if type not in [SpendingMethod.TYPE_CREDIT, SpendingMethod.TYPE_DEBIT]:
         raise exceptions.ClientException("Invalid spending method type")
     method = SpendingMethod(
@@ -37,16 +29,20 @@ def create_spending_method(name:str, type:str, alias:str = None) -> dict:
         alias=alias
     )
     method.save()
-    return method.to_dict()
+    return method
 
-def get_spending_methods():
-    methods = SpendingMethod.query.all()
-    return list(map(lambda e: e.to_dict(), methods))
+def find(filters):
+    query = SpendingMethod.query
+    for attr in filters:
+        if not hasattr(SpendingMethod, attr) or filters[attr] is None:
+            continue
+        query = query.filter(getattr(SpendingMethod, attr)==filters[attr])
+    return query.all()
 
-def find_spending_method_by_id(id:int) -> SpendingMethod:
+def find_id(id:int) -> SpendingMethod:
     return SpendingMethod.query.filter_by(id=id).first()
 
-def find_spending_method(payment_method:str) -> SpendingMethod:
+def find_fuzzy(payment_method:str) -> SpendingMethod:
     method = SpendingMethod.query.filter(or_(
         SpendingMethod.alias == payment_method,
         SpendingMethod.name == spending_category

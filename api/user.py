@@ -9,17 +9,8 @@ class User(db.Model):
     telegram_userid = db.Column(db.Integer, nullable=False)
     session_alias = db.Column(db.String, nullable=True)
     pin = db.Column(db.String, nullable=True)
+    is_active = db.Column(db.Integer, nullable=False)
 
-    @classmethod
-    def get_all(cls) -> list:
-        row_set = cls.query.all()
-        result = []
-        for row in row_set:
-            result.append({
-                "id": row.id,
-                "tlg_uname": row.telegram_username
-            })
-        return result
 
     @classmethod
     def find_by_telegram_account(cls, account_identity):
@@ -47,12 +38,16 @@ class User(db.Model):
 from flask import Blueprint, make_response
 from flask_jwt_extended import jwt_required
 
-bp = Blueprint('user', __name__, url_prefix="/usr")
+bp = Blueprint('user', __name__)
 
-@bp.route("")
-@bp.route("/")
+@bp.route("/user")
 @jwt_required()
 def index():
+    data = list(map(lambda e: {
+        "id": e.id,
+        "telegram_username": e.telegram_username,
+        "is_active": e.is_active
+    }, User.query.all()))
     return make_response({
-        "data": User.get_all()
+        "data": data
     })

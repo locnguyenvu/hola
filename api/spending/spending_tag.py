@@ -1,6 +1,7 @@
 from ..db import db, get_db_session
 from .. import exceptions
 from datetime import datetime
+from .spending_log import SpendingLog
 
 class SpendingTag(db.Model):
     __tablename__ = "spending_tag"
@@ -9,13 +10,7 @@ class SpendingTag(db.Model):
     tag_name = db.Column(db.String, nullable=False)
     created_at = db.Column(db.DateTime, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "name": self.tag_name,
-            "created_at": self.created_at
-        }
+    is_active = db.Column(db.Integer, nullable=False)
 
     def save(self):
         db_session = get_db_session()
@@ -26,10 +21,10 @@ class SpendingLogTag(db.Model):
     __tablename__ = 'spending_log_tag'
 
     id = db.Column(db.Integer, primary_key=True)
-    log_id = db.Column(db.Integer, nullable=False)
-    tag_id = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
+    tag_id = db.Column(db.Integer, db.ForeignKey('spending_tag.id'))
+    log_id = db.Column(db.Integer, db.ForeignKey('spending_log.id'))
 
     def save(self):
         db_session = get_db_session()
@@ -48,6 +43,15 @@ def create_spending_tag(tag_name):
     model.save()
     return True
 
+def edit_spending_tag(id, params):
+    tag = SpendingTag.query.filter_by(id=id).first()
+    if (tag is None):
+        raise exceptions.ClientException(f"Tag with id #{id} does not exist")
+    for attr in params:
+        if (hasattr(tag, attr)):
+            setattr(tag, attr, params[attr])
+    tag.save()
+
 def bulk_tag_logs(tag_id, log_ids):
     tag = SpendingTag.query.filter_by(id=tag_id).first()
     if (tag is None):
@@ -55,3 +59,6 @@ def bulk_tag_logs(tag_id, log_ids):
     for log_id in log_ids:
         tagMapping = SpendingLogTag(tag_id=tag.id, log_id=log_id)
         tagMapping.save()
+
+def get_log_with_tag(tag_id):
+    return SpendingLog.query.join(SpendingLogTag, SpendingLogTag.log_id==SpendingLog.id).filter(SpendingLogTag.tag_id==tag_id).all()

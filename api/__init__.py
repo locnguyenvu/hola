@@ -1,4 +1,4 @@
-from flask import Flask, make_response
+from flask import Blueprint, Flask, make_response
 
 def create_app():
     app = Flask(__name__)
@@ -30,9 +30,9 @@ def create_app():
         app.register_blueprint(user.bp)
 
         from . import spending
-        app.register_blueprint(spending.spending_log_bp)
-        app.register_blueprint(spending.spending_category_bp)
-        app.register_blueprint(spending.spending_method_bp)
-        app.register_blueprint(spending.spending_tag_bp)
+        app.register_blueprint(spending.bp)
+        # app.register_blueprint(spending.spending_category_bp)
+        # app.register_blueprint(spending.spending_method_bp)
+        # app.register_blueprint(spending.spending_tag_bp)
 
     return app
