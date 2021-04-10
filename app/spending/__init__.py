@@ -1,7 +1,7 @@
 from flask import Blueprint, make_response, request
 from flask_jwt_extended import jwt_required
 
-from api import util
+from .. import util
 from . import spending_log, spending_category, spending_method
 
 bp = Blueprint('spending', __name__)

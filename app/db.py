@@ -6,6 +6,7 @@ db = SQLAlchemy()
 def init_app(app):
     db.init_app(app)
     g.db = db
+    g.db_session = db.session
 
 def get_db():
     return db
