@@ -33,9 +33,20 @@ def current_month():
             }
         group_by_category[slog.spending_category_id]['value'] += int(slog.amount)
 
+    value_only = list(map(lambda e: e['value'], group_by_category.values()))
+    value_only.sort(reverse=True)
+
+    categories = []
+    for amount in value_only:
+        result = list(filter(lambda cat, amnt=amount: cat['value'] == amnt, group_by_category.values()))
+        categories.append(list(result).pop())
+
+
     return make_response({
         "total": total_spending_amount,
-        "group_by_categories": list(group_by_category.values())
+        "categories": categories,
+        "from_date": timespan[0],
+        "to_date": timespan[1]
     })
 
 @bp.route("/chart/previous-months")
