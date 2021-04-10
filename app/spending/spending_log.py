@@ -1,6 +1,4 @@
-from api.spending.spending_category import SpendingCategory
 from sqlalchemy import and_
-from datetime import datetime
 
 from .. import exceptions
 from ..db import db, get_db_session 

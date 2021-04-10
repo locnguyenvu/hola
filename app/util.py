@@ -11,7 +11,7 @@ class Datetime:
                 datetime(carrytime.year, carrytime.month, carrytime.day, 0, 0, 0),
                 datetime(carrytime.year, carrytime.month, carrytime.day, 23, 59, 59)
             )
-        if description == "this_month":
+        if description == "current_month":
             carrytime = datetime.today()
             month_range = monthrange(carrytime.year, carrytime.month)
             return (

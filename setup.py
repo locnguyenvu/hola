@@ -15,6 +15,7 @@ setup(
         "Flask",
         "Flask-JWT-Extended",
         "Flask-SQLAlchemy",
+        "flask-cors",
         "uWSGI"
     ]
 )

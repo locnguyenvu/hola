@@ -1,7 +1,7 @@
-from api.spending import spending_category
+from sqlalchemy import or_
+from . import spending_category
 from ..db import db, get_db_session
 from .. import exceptions
-from sqlalchemy import or_
 
 class SpendingMethod(db.Model):
     TYPE_DEBIT = "debit"

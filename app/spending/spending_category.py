@@ -16,6 +16,7 @@ class SpendingCategory(db.Model):
         db_session.add(self)
         db_session.commit()
 
+
 def find(filters) -> list:
     query = SpendingCategory.query
     for attr in filters:

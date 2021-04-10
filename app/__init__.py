@@ -1,9 +1,10 @@
-from flask import Blueprint, Flask, make_response
+from flask import Flask, make_response
+from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__)
+    CORS(app, resources=r'/*')
     app.config.from_object("config.Local")
-
 
     app.add_url_rule('/', endpoint='index')
     @app.route('/health_check')
@@ -31,8 +32,8 @@ def create_app():
 
         from . import spending
         app.register_blueprint(spending.bp)
-        # app.register_blueprint(spending.spending_category_bp)
-        # app.register_blueprint(spending.spending_method_bp)
-        # app.register_blueprint(spending.spending_tag_bp)
+
+        from . import chart
+        app.register_blueprint(chart.bp)
 
     return app
