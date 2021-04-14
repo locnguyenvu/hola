@@ -1,13 +1,20 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-PROJECT_DIR=$(git rev-parse --show-toplevel)
-VENV_PIP="$PROJECT_DIR/env/bin/pip"
-VENV_PYTHON="$PROJECT_DIR/env/bin/python"
+if [ -z $PROJECT_DIR ]; then
+    echo 'Project directory not found!!!'
+    exit 1
+fi
 
-git reset HEAD
+cd $PROJECT_DIR || exit 1
+
+git reset HEAD || exit 1
 git checkout .
 git pull origin main
 
-eval "$VENV_PIP"' install -e .'
+if [ ! -d './env' ]; then
+    python3 -m venv env || exit 1
+fi
+
+eval `./env/bin/pip install -e .`
 
 sudo supervisorctl restart hola_api
