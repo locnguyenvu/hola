@@ -27,3 +27,21 @@ class Datetime:
             )
 
         return tuple()
+
+    @staticmethod
+    def get_time_range_in_past_month(months, starting_month=None) -> tuple:
+        if starting_month is not None and re.match("^\d{4}\-\d{1,2}$", starting_month) is not None:
+            year, month = map(lambda e: int(e), starting_month.split("-"))
+            start_point = datetime(year, month, 1)
+        else:
+            start_point = datetime.today()
+
+        target_year = start_point.year - (months//12)
+        target_month = start_point.month - (months - 12*(months//12))
+        if target_month <= 0 :
+            target_month = 12 - abs(target_month)
+            target_year -= 1
+
+        startime = Datetime.get_time_range_from_text(f"{target_year}-{target_month}")
+        endtime = Datetime.get_time_range_from_text(f"{start_point.year}-{start_point.month}")
+        return ( startime[0], endtime[1])

@@ -1,16 +1,21 @@
 from flask import Blueprint, request, make_response
 from flask_jwt_extended import jwt_required
+from datetime import datetime
 
 from ..util import Datetime
 from ..spending import spending_log, spending_category
 
 bp = Blueprint('chart', __name__)
 
-@bp.route("/chart")
+@bp.route("/chart/expense-by-category")
 @jwt_required()
-def current_month():
+def expense_by_category():
     if request.args.get('timerange') is not None:
         timespan = Datetime.get_time_range_from_text(request.args.get('timerange'))
+    elif request.args.get("from_month") is not None and request.args.get("to_month") is not None:
+        from_timespan = Datetime.get_time_range_from_text(request.args.get("from_month"))
+        to_timespan = Datetime.get_time_range_from_text(request.args.get("to_month"))
+        timespan = (from_timespan[0], to_timespan[1],)
     else:
         timespan = Datetime.get_time_range_from_text('current_month')
     
@@ -45,11 +50,38 @@ def current_month():
     return make_response({
         "total": total_spending_amount,
         "categories": categories,
+        "from_month": timespan[0].strftime('%Y-%m'),
+        "to_month": timespan[1].strftime('%Y-%m')
+    })
+
+@bp.route("/chart/expense-by-month")
+@jwt_required()
+def expense_by_month():
+    months = 6
+    starting_month = None 
+    if request.args.get('months') is not None:
+        months = Datetime.get_time_range_from_text(request.args.get('timerange'))
+    if request.args.get('starting_month') is not None:
+        starting_month = request.args.get('starting_month')
+
+    timespan = Datetime.get_time_range_in_past_month(months, starting_month=starting_month)
+    
+    report_logs = spending_log.find({
         "from_date": timespan[0],
         "to_date": timespan[1]
     })
+    report = {}
+    total = 0
+    for slog in report_logs:
+        key = slog.created_at.strftime('%Y-%m')
+        if key not in report:
+            report[key] = {"key": key, "value": 0}
+        report[key]["value"] += slog.amount
+        total += slog.amount
 
-@bp.route("/chart/previous-months")
-@jwt_required()
-def previous_months():
-    return make_response({"status": "ok"})
+    return make_response({
+        "months": list(report.values()), 
+        "total": total,
+        "from_month": timespan[0].strftime('%Y-%m'),
+        "to_month": timespan[1].strftime('%Y-%m')
+    })
