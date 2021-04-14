@@ -15,6 +15,6 @@ if [ ! -d './env' ]; then
     python3 -m venv env || exit 1
 fi
 
-eval `./env/bin/pip install -e .`
+eval './env/bin/pip install -e .' || exit 1
 
 sudo supervisorctl restart hola_api
