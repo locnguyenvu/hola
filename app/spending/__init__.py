@@ -178,6 +178,7 @@ def spending_tag_tag_log(tag_id):
         for log in tagged_logs:
             total += log.amount
             logs.append({
+                "spending_log_id": log.id,
                 "subject": log.subject,
                 "amount": log.amount
             })

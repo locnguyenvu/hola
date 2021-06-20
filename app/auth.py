@@ -1,11 +1,16 @@
 import re
 import os
 import click
+import collections
+import hashlib
+import hmac
+import time
 from flask.cli import AppGroup
 from base64 import b64encode
-from flask import Blueprint, make_response, abort, request, current_app
+from flask import Blueprint, make_response, abort, request, current_app, redirect
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, get_current_user, jwt_required
+from urllib.parse import urljoin, unquote
 from .user import User
 
 jwt = JWTManager()
@@ -60,6 +65,29 @@ def login(session_alias):
     return make_response({
         "token": create_access_token(user.session_alias)
     })
+
+@bp.route("/telegram-login")
+def telegram_login():
+    query_params = request.args.to_dict()
+    hash_check = query_params.pop('hash')
+    sortParams = collections.OrderedDict(sorted(query_params.items()))
+    message = "\n".join(["{}={}".format(k, unquote(v)) for k, v in sortParams.items()])
+    secret = hashlib.sha256(current_app.config.get('TELEGRAM_SECRET').encode('utf-8'))
+    hash_message = hmac.new(secret.digest(), message.encode('utf-8'), digestmod=hashlib.sha256).hexdigest()
+    if hash_check != hash_message:
+        return abort(401)
+    user = User.find_by_telegram_account(query_params.get('id'))
+    current_time = int(time.time())
+    if (current_time - int(query_params.get('auth_date'))) > 86400 or user is None:
+        return abort(401)
+    
+    user.session_alias = hash_check
+    user.save()
+
+    token = create_access_token(user.session_alias)
+    redirect_url = urljoin(request.headers.get('REFERER'), 'oauth/{}'.format(token))
+    print(redirect_url)
+    return redirect(redirect_url)
 
 @bp.route("/me")
 @jwt_required()
