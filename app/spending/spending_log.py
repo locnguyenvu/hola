@@ -40,7 +40,7 @@ def find(filters):
         del filters['to_date']
     
     for condition in filters:
-        if not hasattr(SpendingLog, condition) or filters[condition] is None:
+        if not hasattr(SpendingLog, condition) or filters[condition] is None or filters[condition] is '':
             continue
         query = query.filter(getattr(SpendingLog, condition)==filters[condition])
 

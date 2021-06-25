@@ -33,7 +33,7 @@ def clear_user_session(jwt_header, jwt_payload):
 @jwt.user_lookup_loader
 def load_user_from_db(jwt_header, jwt_payload):
     sub = jwt_payload['sub']
-    user = User.query.filter_by(session_alias=sub).first()
+    user = User.query.filter_by(telegram_userid=sub).first()
     if user is not None:
         return {
             "id": user.id,
@@ -43,18 +43,6 @@ def load_user_from_db(jwt_header, jwt_payload):
     return user
 
 bp = Blueprint('auth', __name__)
-
-@bp.route("/lmi/<string:telegram_account_identity>")
-def logmein(telegram_account_identity):
-    user = User.find_by_telegram_account(telegram_account_identity)
-    if user is None:
-        return abort(401)
-    
-    user.session_alias = re.sub("[\/=]", "", b64encode(os.urandom(10)).decode("utf8"))
-    user.save()
-    return make_response({
-        "session_id": user.session_alias
-    })
 
 @bp.route("/login/<string:session_alias>", methods=("POST",))
 def login(session_alias):
@@ -84,7 +72,7 @@ def telegram_login():
     user.session_alias = hash_check
     user.save()
 
-    token = create_access_token(user.session_alias)
+    token = create_access_token(user.telegram_userid)
     redirect_url = urljoin(request.headers.get('REFERER'), 'oauth/{}'.format(token))
     print(redirect_url)
     return redirect(redirect_url)

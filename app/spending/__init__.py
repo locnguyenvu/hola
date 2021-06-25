@@ -25,11 +25,13 @@ def spending_log_index():
     filters = {
         "from_date": timespan[0],
         "to_date": timespan[1],
-        "transaction_type": request.args.get("transaction_type")
+        "transaction_type": request.args.get("transaction_type"),
+        "spending_category_id": request.args.get("category_id")
     }
 
     return make_response({
         "data": list(map(lambda e: {
+            "id": e.id,
             "subject": e.subject,
             "amount": e.amount,
             "transaction_type": e.transaction_type,
