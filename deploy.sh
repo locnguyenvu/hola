@@ -1,17 +1,14 @@
 #!/usr/bin/env bash
 
-if [ -z $PROJECT_DIR ]; then
-    echo 'Project directory not found!!!'
-    exit 1
-fi
-
-cd $PROJECT_DIR || exit 1
+SCRIPT_FILE=$0
+APP_PATH=$(dirname $SCRIPT_FILE)
+cd $APP_PATH
 
 git reset HEAD || exit 1
 git checkout .
 git pull origin main
 
-if [ ! -d './env' ]; then
+if [ ! -d "${PWD}/env" ]; then
     python3 -m venv env || exit 1
 fi
 
