@@ -1,15 +1,14 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask import g
 
-db = SQLAlchemy()
-
 def init_app(app):
+    db = SQLAlchemy()
     db.init_app(app)
     g.db = db
-    g.db_session = db.session
 
 def get_db():
-    return db
+    return g.db 
 
 def get_db_session():
-    return db.session
+    return g.db.session
+

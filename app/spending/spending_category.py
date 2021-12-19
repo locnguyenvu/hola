@@ -1,6 +1,8 @@
-from ..db import db, get_db_session
+from ..db import get_db
 from .. import exceptions
 from datetime import datetime
+
+db = get_db()
 
 class SpendingCategory(db.Model):
     __tablename__ = "spending_category"
@@ -12,9 +14,8 @@ class SpendingCategory(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
 
     def save(self):
-        db_session = get_db_session()
-        db_session.add(self)
-        db_session.commit()
+        db.session.add(self)
+        db.session.commit()
 
 
 def find(filters) -> list:
@@ -32,9 +33,8 @@ def delete(category_id) -> bool:
     category = SpendingCategory.query.filter_by(id=category_id).first()
     if category is None:
         return False
-    db_session = get_db_session()
-    db_session.delete(category)
-    db_session.commit()
+    db.session.delete(category)
+    db.session.commit()
     return True
 
 def create(name, display_name=None):

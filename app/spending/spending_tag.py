@@ -1,7 +1,8 @@
-from ..db import db, get_db_session
+from ..db import get_db
 from .. import exceptions
-from datetime import datetime
 from .spending_log import SpendingLog
+
+db = get_db()
 
 class SpendingTag(db.Model):
     __tablename__ = "spending_tag"
@@ -13,9 +14,8 @@ class SpendingTag(db.Model):
     is_active = db.Column(db.Integer, nullable=False)
 
     def save(self):
-        db_session = get_db_session()
-        db_session.add(self)
-        db_session.commit()
+        db.session.add(self)
+        db.session.commit()
 
 class SpendingLogTag(db.Model):
     __tablename__ = 'spending_log_tag'
@@ -27,9 +27,8 @@ class SpendingLogTag(db.Model):
     log_id = db.Column(db.Integer, db.ForeignKey('spending_log.id'))
 
     def save(self):
-        db_session = get_db_session()
-        db_session.add(self)
-        db_session.commit()
+        db.session.add(self)
+        db.session.commit()
 
 def get_all_spending_tag() -> list:
     row_set = SpendingTag.query.all()

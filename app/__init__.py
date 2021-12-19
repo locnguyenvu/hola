@@ -10,6 +10,7 @@ def create_app():
     @app.route('/health_check')
     def healthcheck():
         return {"status": "ok"}
+    _ = healthcheck()
 
     from . import exceptions
     @app.errorhandler(exceptions.ClientException)

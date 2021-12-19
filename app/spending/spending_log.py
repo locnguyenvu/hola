@@ -1,8 +1,10 @@
 from sqlalchemy import and_
 
 from .. import exceptions
-from ..db import db, get_db_session 
+from ..db import get_db
 from .spending_category import find_id as category_find_id
+
+db = get_db()
 
 class SpendingLog(db.Model):
     __tablename__ = "spending_log"
@@ -16,9 +18,8 @@ class SpendingLog(db.Model):
     spending_category_id = db.Column(db.Integer, nullable=True)
     
     def save(self):
-        db_session = get_db_session()
-        db_session.add(self)
-        db_session.commit()
+        db.session.add(self)
+        db.session.commit()
 
     @property
     def category_name(self):
@@ -40,7 +41,7 @@ def find(filters):
         del filters['to_date']
     
     for condition in filters:
-        if not hasattr(SpendingLog, condition) or filters[condition] is None or filters[condition] is '':
+        if not hasattr(SpendingLog, condition) or filters[condition] == None or filters[condition] == '':
             continue
         query = query.filter(getattr(SpendingLog, condition)==filters[condition])
 

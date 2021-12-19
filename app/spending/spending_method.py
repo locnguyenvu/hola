@@ -1,7 +1,8 @@
 from sqlalchemy import or_
-from . import spending_category
-from ..db import db, get_db_session
+from ..db import get_db
 from .. import exceptions
+
+db = get_db()
 
 class SpendingMethod(db.Model):
     TYPE_DEBIT = "debit"
@@ -16,9 +17,8 @@ class SpendingMethod(db.Model):
     created_at = db.Column(db.DateTime)
 
     def save(self):
-        db_session = get_db_session()
-        db_session.add(self)
-        db_session.commit()
+        db.session.add(self)
+        db.session.commit()
 
 def create(name:str, type:str, alias:str = None) :
     if type not in [SpendingMethod.TYPE_CREDIT, SpendingMethod.TYPE_DEBIT]:
@@ -45,6 +45,6 @@ def find_id(id:int) -> SpendingMethod:
 def find_fuzzy(payment_method:str) -> SpendingMethod:
     method = SpendingMethod.query.filter(or_(
         SpendingMethod.alias == payment_method,
-        SpendingMethod.name == spending_category
+        SpendingMethod.name == payment_method 
     )).first()
     return method
