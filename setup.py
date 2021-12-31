@@ -16,6 +16,7 @@ setup(
         "Flask-JWT-Extended",
         "Flask-SQLAlchemy",
         "flask-cors",
-        "uWSGI"
+        "uWSGI",
+        "python-telegram-bot"
     ]
 )
