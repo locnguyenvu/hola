@@ -14,7 +14,6 @@ from flask_jwt_extended import (
     get_current_user,
     jwt_required,
 )
-from rich import print
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from .login_session import new_login_session, find_session_by_name, abandon_session_invalid, terminate_session, is_session_expired
@@ -54,16 +53,19 @@ def load_user_from_db(jwt_header, jwt_payload):
 bp = Blueprint('auth', __name__)
 @bp.route("/auth/<string:session_name>", methods=("POST",))
 def login(session_name):
-    otp = request.args.get('otp')
+    params = request.get_json()
+    if params is None:
+        return abort(401)
+
+    otp = params['otp']
     if otp == None:
         return abort(401)
-    params = request.get_json()
 
     lsession = find_session_by_name(session_name)
     if lsession == None or lsession.otp != otp:
         return abort(401)
     user = User.query.get(lsession.user_id)
-    if user == None or params == None or 'pin' not in params or not check_password_hash(user.pin, params['pin']):
+    if user == None or 'pin' not in params or not check_password_hash(user.pin, params['pin']):
         return abort(401)
     lsession.activate()
     abandon_session_invalid(user.id)
