@@ -17,13 +17,12 @@ class Distpatcher(object):
     def dispatch(self, message: Message):
 
         user = find_by_telegram_account(str(message.sender_id()))
-        from rich import print
-        print(user)
         if user is None:
             handler = UnauthorizeUserHandler()
             handler(message)
             return 
 
+        message.set_user(user)
 
         if not message.is_command():
             pass
@@ -35,10 +34,9 @@ class Distpatcher(object):
                 break
         pass
 
-def init_app(app):
-    _ = app
+def init():
     dispatcher = Distpatcher()
-    dispatcher.register_command("start", LoginHandler())
+    dispatcher.register_command("login", LoginHandler())
     g.dispatcher = dispatcher
     
 

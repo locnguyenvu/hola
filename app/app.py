@@ -12,16 +12,19 @@ def create_app():
         return {"status": "ok"}
     _ = healthcheck()
 
-    from . import exceptions
-    @app.errorhandler(exceptions.ClientException)
     def handle_client_error(error):
         return make_response({
             "error": f"{error}"
         }, 400)
+    app.register_error_handler(400, handle_client_error)
 
     with app.app_context():
-        from . import db
+        from . import db, telebot
         db.init_app(app)
+        telebot.init_app(app)
+
+        from .bot import disptacher
+        disptacher.init()
 
         from . import auth
         auth.init_app(app)
@@ -36,12 +39,6 @@ def create_app():
 
         from . import chart
         app.register_blueprint(chart.bp)
-
-        from . import telebot
-        telebot.init_app(app)
-
-        from .bot import disptacher
-        disptacher.init_app(app)
 
         from .bot import webhook, cli
         app.register_blueprint(webhook.bp)

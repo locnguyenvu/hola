@@ -1,8 +1,10 @@
-from ..telebot import get_bot
+from app import login_session, telebot
+from flask import current_app
+
 from .message import Message
 from abc import ABC, abstractmethod
 
-bot = get_bot()
+bot = telebot.get_bot()
 
 class Handler(ABC):
 
@@ -33,6 +35,16 @@ class UnauthorizeUserHandler(Handler):
 class LoginHandler(Handler):
     
     def process(self):
-        self.reply("HELLO, WORLD")
+        user = self.message.get_user()
+        if user is None:
+            return
+        ls = login_session.new_login_session(user.id)
+
+        message = "{web_base_url}/login/{session_name}?otp={otp}".format(
+                web_base_url = current_app.config["WEB_BASE_URL"],
+                session_name = ls.session_name,
+                otp = ls.otp)
+
+        self.reply(message)
         pass
 

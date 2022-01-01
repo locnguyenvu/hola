@@ -1,4 +1,5 @@
 import random
+import uuid
 
 from datetime import datetime, timedelta
 from flask import current_app
@@ -51,12 +52,12 @@ class LoginSession(db.Model):
 
 
 def new_login_session(user_id:int) -> LoginSession:
-    code = random.randint(1000000, 9000000)
+    code = uuid.uuid4()
     ttl = datetime.now() + timedelta(seconds=5*60)
-    otp = random.randint(1000, 9999)
+    otp = random.randint(100000, 999999)
     session = LoginSession(
         user_id = user_id,
-        session_name = code,
+        session_name = str(code),
         state = STATE_NEW,
         otp = otp,
         created_at = datetime.now(),
