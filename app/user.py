@@ -1,5 +1,10 @@
 import re
-from .db import db, get_db_session
+from flask import Blueprint, make_response
+from flask_jwt_extended import jwt_required
+
+from .db import get_db
+
+db = get_db()
 
 class User(db.Model):
     __tablename__ = "user"
@@ -14,7 +19,7 @@ class User(db.Model):
 
     @classmethod
     def find_by_telegram_account(cls, account_identity):
-        if re.match("^\-*\d+$", account_identity):
+        if re.match(r"^\-*\d+$", account_identity):
             row = cls.query.filter_by(telegram_userid=account_identity).first()
         else:
             row = cls.query.filter_by(telegram_username=account_identity).first()
@@ -25,18 +30,21 @@ class User(db.Model):
         record = cls.query.filter_by(session_alias=session_alias).first()
         if record is not None:
             record.session_allias = None
-            db_session = get_db_session()
-            db_session.add(record)
-            db_session.commit()
+            db.session.add(record)
+            db.session.commit()
 
     def save(self):
-        db_session = get_db_session()
-        db_session.add(self)
-        db_session.commit()
+        db.session.add(self)
+        db.session.commit()
+
+def find_by_telegram_account(account_identity):
+    if re.match(r"^\-*\d+$", account_identity):
+        row = User.query.filter_by(telegram_userid=account_identity).first()
+    else:
+        row = User.query.filter_by(telegram_username=account_identity).first()
+    return row
 
 
-from flask import Blueprint, make_response
-from flask_jwt_extended import jwt_required
 
 bp = Blueprint('user', __name__)
 
@@ -51,3 +59,5 @@ def index():
     return make_response({
         "data": data
     })
+
+

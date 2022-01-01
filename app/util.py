@@ -18,7 +18,7 @@ class Datetime:
                 datetime(carrytime.year, carrytime.month, 1, 0, 0, 0),
                 datetime(carrytime.year, carrytime.month, month_range[1], 23, 59, 59)
             )
-        if re.match("^\d{4}\-\d{1,2}$", description) is not None:
+        if re.match(r"^\d{4}\-\d{1,2}$", description) is not None:
             year, month = map(lambda e: int(e), description.split("-"))
             month_range = monthrange(year, month)
             return (
@@ -30,7 +30,7 @@ class Datetime:
 
     @staticmethod
     def get_time_range_in_past_month(months, starting_month=None) -> tuple:
-        if starting_month is not None and re.match("^\d{4}\-\d{1,2}$", starting_month) is not None:
+        if starting_month is not None and re.match(r"^\d{4}\-\d{1,2}$", starting_month) is not None:
             year, month = map(lambda e: int(e), starting_month.split("-"))
             start_point = datetime(year, month, 1)
         else:

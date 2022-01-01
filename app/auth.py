@@ -1,16 +1,23 @@
-import re
-import os
-import click
 import collections
 import hashlib
 import hmac
+import re
 import time
+from urllib.parse import unquote, urljoin
+
+import click
+from flask import Blueprint, abort, current_app, make_response, redirect, request
 from flask.cli import AppGroup
-from base64 import b64encode
-from flask import Blueprint, make_response, abort, request, current_app, redirect
+from flask_jwt_extended import (
+    JWTManager,
+    create_access_token,
+    get_current_user,
+    jwt_required,
+)
+from rich import print
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_jwt_extended import JWTManager, create_access_token, get_current_user, jwt_required
-from urllib.parse import urljoin, unquote
+
+from .login_session import new_login_session, find_session_by_name, abandon_session_invalid, terminate_session, is_session_expired
 from .user import User
 
 jwt = JWTManager()
@@ -20,9 +27,10 @@ def init_app(app):
 
 @jwt.expired_token_loader
 def clear_user_session(jwt_header, jwt_payload):
+    _ = jwt_header
     try:
-        sub = jwt_payload['sub']
-        User.clear_session(sub)
+        _, session_name = jwt_payload['sub'].split('.')
+        terminate_session(session_name)
     except:
         pass
     finally:
@@ -32,26 +40,36 @@ def clear_user_session(jwt_header, jwt_payload):
 
 @jwt.user_lookup_loader
 def load_user_from_db(jwt_header, jwt_payload):
-    sub = jwt_payload['sub']
-    user = User.query.filter_by(telegram_userid=sub).first()
-    if user is not None:
+    _ = jwt_header
+    user_id, session_name = jwt_payload['sub'].split('.')
+    user = User.query.filter_by(id=user_id).first()
+    if user is not None and is_session_expired(session_name) is False:
         return {
             "id": user.id,
             "tlg_username": user.telegram_username,
             "tlg_userid": user.telegram_userid
         }
-    return user
+    return None
 
 bp = Blueprint('auth', __name__)
-
-@bp.route("/login/<string:session_alias>", methods=("POST",))
-def login(session_alias):
-    params = request.get_json()
-    user = User.query.filter_by(session_alias=session_alias).first()
-    if user is None or params is None or 'pin' not in params or not check_password_hash(user.pin, params['pin']):
+@bp.route("/auth/<string:session_name>", methods=("POST",))
+def login(session_name):
+    otp = request.args.get('otp')
+    if otp == None:
         return abort(401)
+    params = request.get_json()
+
+    lsession = find_session_by_name(session_name)
+    if lsession == None or lsession.otp != otp:
+        return abort(401)
+    user = User.query.get(lsession.user_id)
+    if user == None or params == None or 'pin' not in params or not check_password_hash(user.pin, params['pin']):
+        return abort(401)
+    lsession.activate()
+    abandon_session_invalid(user.id)
+    jwt_sub = "{user_id}.{session_name}".format(user_id=user.id, session_name=lsession.session_name)
     return make_response({
-        "token": create_access_token(user.session_alias)
+        "token": create_access_token(jwt_sub)
     })
 
 @bp.route("/telegram-login")
@@ -66,15 +84,18 @@ def telegram_login():
         return abort(401)
     user = User.find_by_telegram_account(query_params.get('id'))
     current_time = int(time.time())
-    if (current_time - int(query_params.get('auth_date'))) > 86400 or user is None:
+    jwt_auth_time = int(query_params.get('auth_date') or 0)
+    if (current_time - jwt_auth_time) > current_app.config['JWT_ACCESS_TOKEN_EXPIRES'] or user is None:
         return abort(401)
     
     user.session_alias = hash_check
     user.save()
 
-    token = create_access_token(user.telegram_userid)
+    lsession = new_login_session(user.id)
+    lsession.activate()
+    jwt_sub = "{user_id}.{session_alias}".format(user_id=user.id, session_name=lsession.session_name)
+    token = create_access_token(jwt_sub)
     redirect_url = urljoin(request.headers.get('REFERER'), 'oauth/{}'.format(token))
-    print(redirect_url)
     return redirect(redirect_url)
 
 @bp.route("/me")
@@ -84,8 +105,7 @@ def me():
     return make_response({"status": "ok", "data": user})
 
 cli = AppGroup('auth')
-
-@cli.command('register')
+@cli.command('register', with_appcontext=True)
 @click.argument('username')
 def cli_register_user(username):
     user = User.find_by_telegram_account(username)
@@ -93,10 +113,20 @@ def cli_register_user(username):
         print(f'\n!Err: {username} does not exit\n')
         return
     pin = ''
-    while re.match('^\d{4}$', pin.strip()) is None:
+    while re.match(r'^\d{4}$', pin.strip()) is None:
         pin = input('Pin (4 digits): ')
 
     user.pin = generate_password_hash(pin)
     user.save()
     print(f'\nSuccess!\n')
     
+
+@cli.command("new_login_session", with_appcontext=True)
+@click.argument('username')
+def cli_new_session(username):
+    user = User.find_by_telegram_account(username)
+    if user is None:
+        print(f'\n!Err: {username} does not exit\n')
+        return
+    session = new_login_session(user.id)
+    print(session)
