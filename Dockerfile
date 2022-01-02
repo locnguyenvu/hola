@@ -1,13 +1,13 @@
-FROM python:3.8-alpine3.12
+FROM python:alpine
 
 WORKDIR /src
 
-COPY requirements.txt .
-RUN apk add --no-cache --virtual .build-deps g++ python3-dev libffi-dev openssl-dev && \
-    apk add --no-cache --update python3
-RUN pip3 install -r requirements.txt
+COPY setup.py .
+RUN apk add --no-cache --virtual .build-deps g++ libffi-dev openssl-dev 
+RUN python -m pip install -e . 
 
-ENV FLASK_APP="api"
-ENV FLASK_DEBUG=0
+COPY config.py .
+COPY wsgi.py .
+COPY app ./app
 
-#CMD ["flask", "run"]
+CMD ["uwsgi", "--socket", "0.0.0.0:5000", "--protocol", "http", "-w","wsgi:hola_api"]

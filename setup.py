@@ -1,9 +1,4 @@
-import pathlib
 from setuptools import setup, find_packages
-
-HERE = pathlib.Path(__file__).parent
-
-README = (HERE / "README.md").read_text()
 
 setup(
     name="locnguyenvu-hola",
@@ -17,6 +12,8 @@ setup(
         "Flask-SQLAlchemy",
         "flask-cors",
         "uWSGI",
-        "python-telegram-bot"
+        "python-telegram-bot",
+        "python-dotenv",
+        "rich"
     ]
 )

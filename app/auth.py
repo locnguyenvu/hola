@@ -17,7 +17,7 @@ from flask_jwt_extended import (
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from .login_session import new_login_session, find_session_by_name, abandon_session_invalid, terminate_session, is_session_expired
-from .user import User
+from app.user import User, find_by_id, find_by_telegram_account
 
 jwt = JWTManager()
 
@@ -41,7 +41,7 @@ def clear_user_session(jwt_header, jwt_payload):
 def load_user_from_db(jwt_header, jwt_payload):
     _ = jwt_header
     user_id, session_name = jwt_payload['sub'].split('.')
-    user = User.query.filter_by(id=user_id).first()
+    user = find_by_id(user_id=user_id)
     if user is not None and is_session_expired(session_name) is False:
         return {
             "id": user.id,
@@ -84,7 +84,7 @@ def telegram_login():
     hash_message = hmac.new(secret.digest(), message.encode('utf-8'), digestmod=hashlib.sha256).hexdigest()
     if hash_check != hash_message:
         return abort(401)
-    user = User.find_by_telegram_account(query_params.get('id'))
+    user = find_by_telegram_account(query_params.get('id'))
     current_time = int(time.time())
     jwt_auth_time = int(query_params.get('auth_date') or 0)
     if (current_time - jwt_auth_time) > current_app.config['JWT_ACCESS_TOKEN_EXPIRES'] or user is None:
@@ -110,7 +110,7 @@ cli = AppGroup('auth')
 @cli.command('register', with_appcontext=True)
 @click.argument('username')
 def cli_register_user(username):
-    user = User.find_by_telegram_account(username)
+    user = find_by_telegram_account(username)
     if user is None:
         print(f'\n!Err: {username} does not exit\n')
         return
@@ -126,7 +126,7 @@ def cli_register_user(username):
 @cli.command("new_login_session", with_appcontext=True)
 @click.argument('username')
 def cli_new_session(username):
-    user = User.find_by_telegram_account(username)
+    user = find_by_telegram_account(username)
     if user is None:
         print(f'\n!Err: {username} does not exit\n')
         return

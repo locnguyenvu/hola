@@ -44,6 +44,8 @@ def find_by_telegram_account(account_identity):
         row = User.query.filter_by(telegram_username=account_identity).first()
     return row
 
+def find_by_id(user_id):
+    return User.query.filter_by(id=user_id).first()
 
 
 bp = Blueprint('user', __name__)
