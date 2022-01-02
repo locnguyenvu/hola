@@ -4,7 +4,7 @@ jobs:
   build:
     working_directory: /src
     docker:
-      - image: arvindr226/alpine-ssh
+      - image: circleci/python
     steps:
       - checkout
       - setup_remote_docker
