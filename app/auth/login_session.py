@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from flask import current_app
 from sqlalchemy import and_
 
-from app.db import get_db
+from app.di import get_db
 
 db = get_db()
 

@@ -18,17 +18,14 @@ def create_app():
     app.register_error_handler(400, handle_client_error)
 
     with app.app_context():
-        from . import db, telebot
-        db.init_app(app)
-        telebot.init_app(app)
+        from . import di
+        di.bootstrap(app)
 
         from . import dbconfig
         dbconfig.load_dbconfig(app)
-
-        from . import auth
+      
+        from . import auth, http, cli, bot
         auth.init_app(app)
-
-        from . import http, cli, bot
         http.init_app(app)
         cli.init_app(app)
         bot.init_app(app)

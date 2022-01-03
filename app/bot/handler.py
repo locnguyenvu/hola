@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 from flask import current_app
 
-from app import telebot
+from app.di import get_bot
 from app.auth import login_session
 from .message import Message
 
 class Handler(ABC):
 
-    Bot = telebot.get_bot()
+    Bot = get_bot()
 
     def __init__(self):
         pass

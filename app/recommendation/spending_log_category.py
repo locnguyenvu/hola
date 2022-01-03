@@ -2,7 +2,7 @@ import re
 from datetime import date, datetime
 from sqlalchemy import and_
 
-from app.db import get_db
+from app.di import get_db
 import app.spending.log as spending_log
 import app.spending.category as spending_category
 

@@ -12,6 +12,8 @@ bp = Blueprint("telegram", __name__)
 def telegram():
 
     payload = request.get_json(force=True)
+    from rich import print
+    print(payload)
     if payload == None:
         return make_response({"status": "Error"}, 400)
     mess = Message(payload["message"])

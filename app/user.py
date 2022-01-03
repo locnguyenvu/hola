@@ -2,7 +2,7 @@ import re
 from flask import Blueprint, make_response
 from flask_jwt_extended import jwt_required
 
-from .db import get_db
+from .di import get_db
 
 db = get_db()
 

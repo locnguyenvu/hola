@@ -1,7 +1,7 @@
 from sqlalchemy import and_
 
 from app import exceptions
-from app.db import get_db
+from app.di import get_db
 import app.spending.category as spendingcategory
 
 db = get_db()

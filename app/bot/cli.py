@@ -1,6 +1,6 @@
 import click
 from flask.cli import with_appcontext
-from app.telebot import get_bot
+from app.di import get_bot
 
 bot = get_bot()
 

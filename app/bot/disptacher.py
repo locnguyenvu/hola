@@ -30,6 +30,12 @@ class Distpatcher(object):
                     handler = self.routes[route]
                     handler(message)
                     break
+            return
         
+        if message.is_from_spending_group():
+            handler = UnauthorizeUserHandler()
+            handler(message)
+            return 
+
         pass
 

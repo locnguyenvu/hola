@@ -1,10 +1,10 @@
 from flask.helpers import make_response
 from flask_jwt_extended import JWTManager
 
-from app import user
+from app import user, di
 from .login_session import terminate_session, is_session_expired
 
-jwt = JWTManager()
+jwt = di.get_jwt()
 
 @jwt.expired_token_loader
 def clear_user_session(jwt_header, jwt_payload):

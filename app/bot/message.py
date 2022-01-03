@@ -1,4 +1,5 @@
 import re
+from flask import current_app
 
 from app.user import User
 
@@ -26,3 +27,11 @@ class Message:
 
     def get_user(self):
         return self.user
+
+    def chat_id(self):
+        return self.chat["id"]
+
+    def is_from_spending_group(self) -> bool:
+        if self.chat_id() == self.sender_id():
+            return False
+        return str(self.chat_id()) == current_app.config.get("telegram.group.spending_log")
