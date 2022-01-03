@@ -2,7 +2,7 @@ from flask import g
 
 from app.user import find_by_telegram_account
 from .message import Message
-from .handler import LoginHandler, UnauthorizeUserHandler
+from .handler import UnauthorizeUserHandler
 
 class Distpatcher(object):
 
@@ -34,11 +34,3 @@ class Distpatcher(object):
                 break
         pass
 
-def init():
-    dispatcher = Distpatcher()
-    dispatcher.register_command("login", LoginHandler())
-    g.dispatcher = dispatcher
-    
-
-def get_dispatcher():
-    return g.dispatcher

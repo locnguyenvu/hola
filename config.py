@@ -13,3 +13,5 @@ class Local(object):
    SQLALCHEMY_TRACK_MODIFICATIONS=False
 
    TELEGRAM_SECRET = os.getenv("TELEGRAM_SECRET")
+
+   WEB_BASE_URL = os.getenv("WEB_BASE_URL")

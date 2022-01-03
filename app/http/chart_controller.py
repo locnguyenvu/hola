@@ -1,13 +1,12 @@
-from flask import Blueprint, request, make_response
+from flask import request, make_response
 from flask_jwt_extended import jwt_required
 from datetime import datetime
 
-from ..util import Datetime
-from ..spending import spending_log, spending_category
+from app.util import Datetime
+import app.spending.log as spending_log
+import app.spending.category as spending_category
 
-bp = Blueprint('chart', __name__)
 
-@bp.route("/chart/expense-by-category")
 @jwt_required()
 def expense_by_category():
     if request.args.get('timerange') is not None:
@@ -54,7 +53,6 @@ def expense_by_category():
         "to_month": timespan[1].strftime('%Y-%m')
     })
 
-@bp.route("/chart/expense-by-month")
 @jwt_required()
 def expense_by_month():
     months = 6

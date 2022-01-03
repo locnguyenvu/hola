@@ -1,10 +1,11 @@
 from sqlalchemy import or_
-from ..db import get_db
-from .. import exceptions
+
+from app import exceptions
+from app.db import get_db
 
 db = get_db()
 
-class SpendingMethod(db.Model):
+class Method(db.Model):
     TYPE_DEBIT = "debit"
     TYPE_CREDIT = "credit"
 
@@ -21,9 +22,9 @@ class SpendingMethod(db.Model):
         db.session.commit()
 
 def create(name:str, type:str, alias:str = None) :
-    if type not in [SpendingMethod.TYPE_CREDIT, SpendingMethod.TYPE_DEBIT]:
+    if type not in [Method.TYPE_CREDIT, Method.TYPE_DEBIT]:
         raise exceptions.ClientException("Invalid spending method type")
-    method = SpendingMethod(
+    method = Method(
         name=name,
         type=type,
         alias=alias
@@ -32,19 +33,19 @@ def create(name:str, type:str, alias:str = None) :
     return method
 
 def find(filters):
-    query = SpendingMethod.query
+    query = Method.query
     for attr in filters:
-        if not hasattr(SpendingMethod, attr) or filters[attr] is None:
+        if not hasattr(Method, attr) or filters[attr] is None:
             continue
-        query = query.filter(getattr(SpendingMethod, attr)==filters[attr])
+        query = query.filter(getattr(Method, attr)==filters[attr])
     return query.all()
 
-def find_id(id:int) -> SpendingMethod:
-    return SpendingMethod.query.filter_by(id=id).first()
+def find_id(id:int) -> Method:
+    return Method.query.filter_by(id=id).first()
 
-def find_fuzzy(payment_method:str) -> SpendingMethod:
-    method = SpendingMethod.query.filter(or_(
-        SpendingMethod.alias == payment_method,
-        SpendingMethod.name == payment_method 
+def find_fuzzy(payment_method:str) -> Method:
+    method = Method.query.filter(or_(
+        Method.alias == payment_method,
+        Method.name == payment_method 
     )).first()
     return method

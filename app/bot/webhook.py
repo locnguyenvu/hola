@@ -1,11 +1,11 @@
 from flask import Blueprint, make_response, request
-from app.telebot import get_bot
 
 from .message import Message
-from .disptacher import get_dispatcher
+from .handler import LoginHandler
+from .disptacher import Distpatcher
 
-bot = get_bot()
-disptacher = get_dispatcher()
+dispatcher = Distpatcher()
+dispatcher.register_command("login", LoginHandler())
 
 bp = Blueprint("telegram", __name__)
 @bp.route("/telegram", methods=("GET", "POST"))
@@ -15,7 +15,6 @@ def telegram():
     if payload == None:
         return make_response({"status": "Error"}, 400)
     mess = Message(payload["message"])
-    disptacher.dispatch(mess)
+    dispatcher.dispatch(mess)
 
     return make_response({"status": "Success"}, 200)
-

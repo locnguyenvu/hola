@@ -1,12 +1,12 @@
 from sqlalchemy import and_
 
-from .. import exceptions
-from ..db import get_db
-from .spending_category import find_id as category_find_id
+from app import exceptions
+from app.db import get_db
+import app.spending.category as spendingcategory
 
 db = get_db()
 
-class SpendingLog(db.Model):
+class Log(db.Model):
     __tablename__ = "spending_log"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -23,42 +23,40 @@ class SpendingLog(db.Model):
 
     @property
     def category_name(self):
-        category = category_find_id(self.spending_category_id)
-        if category is not None:
-            return category.display_name
+        lcat = spendingcategory.find_id(self.spending_category_id)
+        if lcat is not None:
+            return lcat.display_name
         return None
 
-        
-
 def find(filters):
-    query = SpendingLog.query
+    query = Log.query
     if 'from_date' in filters and 'to_date' in filters:
         query = query.filter(and_(
-            SpendingLog.created_at >= filters['from_date'],
-            SpendingLog.created_at <= filters['to_date']
+            Log.created_at >= filters['from_date'],
+            Log.created_at <= filters['to_date']
         ))
         del filters['from_date']
         del filters['to_date']
     
     for condition in filters:
-        if not hasattr(SpendingLog, condition) or filters[condition] == None or filters[condition] == '':
+        if not hasattr(Log, condition) or filters[condition] == None or filters[condition] == '':
             continue
-        query = query.filter(getattr(SpendingLog, condition)==filters[condition])
+        query = query.filter(getattr(Log, condition)==filters[condition])
 
     return query.all()
 
-def find_id(id:int) -> SpendingLog:
-    return SpendingLog.query.filter_by(id=id).first()
+def find_id(id:int) -> Log:
+    return Log.query.filter_by(id=id).first()
 
 
 def edit(id:int, payloads):
-    slog = SpendingLog.query.filter_by(id=id).first()
+    slog = Log.query.filter_by(id=id).first()
     if slog is None:
         raise exceptions.ClientException(f"#{id} does not existed")
     for attr in payloads:
         if not hasattr(slog, attr) or payloads[attr] is None or attr == 'id':
             continue
-        if attr == 'spending_category_id' and category_find_id(payloads[attr]) is None:
+        if attr == 'spending_category_id' and spendingcategory.find_id(payloads[attr]) is None:
             raise exceptions.ClientException(f"Category id #{payloads[attr]} does not existed")
             
         setattr(slog, attr, payloads[attr])

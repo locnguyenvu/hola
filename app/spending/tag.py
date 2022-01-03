@@ -1,10 +1,11 @@
-from ..db import get_db
-from .. import exceptions
-from .spending_log import SpendingLog
+import app.spending.log as spendinglog
+
+from app import exceptions
+from app.db import get_db
 
 db = get_db()
 
-class SpendingTag(db.Model):
+class Tag(db.Model):
     __tablename__ = "spending_tag"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -17,7 +18,7 @@ class SpendingTag(db.Model):
         db.session.add(self)
         db.session.commit()
 
-class SpendingLogTag(db.Model):
+class LogTag(db.Model):
     __tablename__ = 'spending_log_tag'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -31,19 +32,19 @@ class SpendingLogTag(db.Model):
         db.session.commit()
 
 def get_all_spending_tag() -> list:
-    row_set = SpendingTag.query.all()
+    row_set = Tag.query.all()
     return row_set
 
 def create_spending_tag(tag_name):
-    existed = SpendingTag.query.filter_by(tag_name=tag_name).all()
+    existed = Tag.query.filter_by(tag_name=tag_name).all()
     if (len(existed) > 0):
         raise exceptions.ClientException(f"Tag name *{tag_name}* has existed")
-    model = SpendingTag(tag_name=tag_name)
+    model = Tag(tag_name=tag_name)
     model.save()
     return True
 
 def edit_spending_tag(id, params):
-    tag = SpendingTag.query.filter_by(id=id).first()
+    tag = Tag.query.filter_by(id=id).first()
     if (tag is None):
         raise exceptions.ClientException(f"Tag with id #{id} does not exist")
     for attr in params:
@@ -52,12 +53,12 @@ def edit_spending_tag(id, params):
     tag.save()
 
 def bulk_tag_logs(tag_id, log_ids):
-    tag = SpendingTag.query.filter_by(id=tag_id).first()
+    tag = Tag.query.filter_by(id=tag_id).first()
     if (tag is None):
         raise exceptions.ClientException(f"Tag id #{tag_id} does not exist")
     for log_id in log_ids:
-        tagMapping = SpendingLogTag(tag_id=tag.id, log_id=log_id)
+        tagMapping = LogTag(tag_id=tag.id, log_id=log_id)
         tagMapping.save()
 
 def get_log_with_tag(tag_id):
-    return SpendingLog.query.join(SpendingLogTag, SpendingLogTag.log_id==SpendingLog.id).filter(SpendingLogTag.tag_id==tag_id).all()
+    return spendinglog.Log.query.join(LogTag, LogTag.log_id==spendinglog.Log.id).filter(LogTag.tag_id==tag_id).all()

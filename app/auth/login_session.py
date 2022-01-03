@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from flask import current_app
 from sqlalchemy import and_
 
-from .db import get_db
+from app.db import get_db
 
 db = get_db()
 
@@ -90,4 +90,6 @@ def terminate_session(name:str):
 
 def is_session_expired(name:str) -> bool:
     sess = LoginSession.query.filter_by(session_name=name).first()
+    if sess is None:
+        return False
     return sess.is_expired()
