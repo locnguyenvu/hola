@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
+from flask import current_app
 
 from app import telebot
 from app.auth import login_session
-from flask import current_app
-
 from .message import Message
 
 class Handler(ABC):
@@ -48,3 +47,7 @@ class LoginHandler(Handler):
         self.reply(message)
         pass
 
+class SpendingLogHandler(Handler):
+
+    def process(self):
+        pass

@@ -24,13 +24,12 @@ class Distpatcher(object):
 
         message.set_user(user)
 
-        if not message.is_command():
-            pass
-
-        for route in self.routes:
-            if route == message.get_command():
-                handler = self.routes[route]
-                handler(message)
-                break
+        if message.is_command():
+            for route in self.routes:
+                if route == message.get_command():
+                    handler = self.routes[route]
+                    handler(message)
+                    break
+        
         pass
 

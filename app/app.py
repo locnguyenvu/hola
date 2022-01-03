@@ -22,12 +22,15 @@ def create_app():
         db.init_app(app)
         telebot.init_app(app)
 
+        from . import dbconfig
+        dbconfig.load_dbconfig(app)
+
         from . import auth
         auth.init_app(app)
 
-        from . import http, console, bot
+        from . import http, cli, bot
         http.init_app(app)
-        console.init_app(app)
+        cli.init_app(app)
         bot.init_app(app)
 
     return app
