@@ -80,7 +80,7 @@ def list_category_id(subject: str) -> list:
         return []
 
     categories = spending_category.Category.query.filter(spending_category.Category.id.in_(categories_id.keys())).all()
-    categories_id_order_by_hits = {k: v for k, v in sorted(categories_id.items(), key=lambda item: item[1], reverse=True)}
+    categories_id_order_by_hits = {k: v for k, v in sorted(categories_id.items(), key=lambda item: item[1], reverse=False)}
     
     output = []
 
