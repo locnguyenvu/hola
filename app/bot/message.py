@@ -4,9 +4,7 @@ from flask import current_app
 from app.user import User
 
 class Message:
-    """
-    payload structure:
-    
+    """payload structure:
     {
         'update_id': -1,
         'message': {

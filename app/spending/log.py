@@ -1,3 +1,4 @@
+import re
 from sqlalchemy import and_
 
 from app import exceptions
@@ -5,6 +6,10 @@ from app.di import get_db
 import app.spending.category as spendingcategory
 
 db = get_db()
+
+
+TRANSACTION_TYPE_CREDIT = "credit"
+TRANSACTION_TYPE_DEBIT = "debit"
 
 class Log(db.Model):
     __tablename__ = "spending_log"
@@ -27,6 +32,11 @@ class Log(db.Model):
         if lcat is not None:
             return lcat.display_name
         return None
+    
+    def set_amount_str(self, amount:str):
+        if re.search(r"k$") != None:
+            main = amount[0:amount.index("k")]
+
 
 def find(filters):
     query = Log.query
@@ -61,3 +71,29 @@ def edit(id:int, payloads):
             
         setattr(slog, attr, payloads[attr])
     slog.save()
+
+def parse_chat_content(content:str) -> Log:
+    
+    msg_chunks = content.split(" ")
+    amount = None
+    for word in msg_chunks:
+        amount_match = re.search(r"^\d+kc*", word)
+        if amount_match is None:
+            continue
+        else:
+            amount = amount_match[0]
+
+    if amount is None:
+        raise ValueError("Invalid chat message, spending amount not found")
+
+    if amount in msg_chunks:
+        msg_chunks.remove(amount)
+
+    sl = Log()
+    sl.subject = " ".join(msg_chunks)
+    sl.transaction_type = TRANSACTION_TYPE_DEBIT
+    if re.search(r"c$", amount):
+        sl.transaction_type = TRANSACTION_TYPE_CREDIT
+        amount = amount.rstrip("c")
+
+    return sl
