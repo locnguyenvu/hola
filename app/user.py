@@ -2,7 +2,7 @@ import re
 from flask import Blueprint, make_response
 from flask_jwt_extended import jwt_required
 
-from .db import get_db
+from .di import get_db
 
 db = get_db()
 
@@ -46,20 +46,3 @@ def find_by_telegram_account(account_identity):
 
 def find_by_id(user_id):
     return User.query.filter_by(id=user_id).first()
-
-
-bp = Blueprint('user', __name__)
-
-@bp.route("/user")
-@jwt_required()
-def index():
-    data = list(map(lambda e: {
-        "id": e.id,
-        "telegram_username": e.telegram_username,
-        "is_active": e.is_active
-    }, User.query.all()))
-    return make_response({
-        "data": data
-    })
-
-

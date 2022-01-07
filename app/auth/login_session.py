@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from flask import current_app
 from sqlalchemy import and_
 
-from .db import get_db
+from app.di import get_db
 
 db = get_db()
 
@@ -53,7 +53,7 @@ class LoginSession(db.Model):
 
 def new_login_session(user_id:int) -> LoginSession:
     code = uuid.uuid4()
-    ttl = datetime.now() + timedelta(seconds=5*60)
+    ttl = datetime.now() + timedelta(seconds=2*60)
     otp = random.randint(100000, 999999)
     session = LoginSession(
         user_id = user_id,
@@ -90,4 +90,6 @@ def terminate_session(name:str):
 
 def is_session_expired(name:str) -> bool:
     sess = LoginSession.query.filter_by(session_name=name).first()
+    if sess is None:
+        return False
     return sess.is_expired()

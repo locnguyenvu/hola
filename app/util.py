@@ -3,15 +3,19 @@ from datetime import datetime
 from calendar import monthrange
 
 class Datetime:
+
+    TODAY = "today"
+    CURRENT_MONTH = "current_month"
+
     @staticmethod
     def get_time_range_from_text(description) -> tuple:
-        if description == "today":
+        if description == Datetime.TODAY:
             carrytime = datetime.today()
             return (
                 datetime(carrytime.year, carrytime.month, carrytime.day, 0, 0, 0),
                 datetime(carrytime.year, carrytime.month, carrytime.day, 23, 59, 59)
             )
-        if description == "current_month":
+        if description == Datetime.CURRENT_MONTH:
             carrytime = datetime.today()
             month_range = monthrange(carrytime.year, carrytime.month)
             return (
