@@ -1,5 +1,5 @@
 import re
-from datetime import date, datetime
+from datetime import datetime
 from sqlalchemy import and_
 
 from app.di import get_db
@@ -28,6 +28,14 @@ class SpendingLogCategory(db.Model):
             self.hits = 0
         self.hits = self.hits + 1
 
+    def decrease_hit(self):
+        if self.hits is None:
+            self.hits = 0
+        elif self.hits > 0:
+            self.hits = self.hits - 1
+
+        
+
 def first_or_new(word:str, position, category_id:int) -> SpendingLogCategory:
     record = SpendingLogCategory.query.filter(and_(
         SpendingLogCategory.word == word,
@@ -43,6 +51,14 @@ def first_or_new(word:str, position, category_id:int) -> SpendingLogCategory:
         )
     return record
 
+def delete(model: SpendingLogCategory):
+    db.session.delete(model)
+    db.session.commit()
+
+def save(model: SpendingLogCategory):
+    db.session.add(model)
+    db.session.commit()
+
 def tokenize(slog: spending_log.Log):
     worlds = slog.subject.split(" ")
     
@@ -53,6 +69,23 @@ def tokenize(slog: spending_log.Log):
         node = first_or_new(w, idx, slog.spending_category_id)
         node.increase_hit()
         node.save()
+
+def detokenize(slog: spending_log.Log):
+    worlds = slog.subject.split(" ")
+    
+    for idx, w in enumerate(worlds):
+        if re.search(r"^\d+$", w) is not None:
+            continue
+
+        node = first_or_new(w, idx, slog.spending_category_id)
+        if node.id is None:
+            continue
+
+        node.decrease_hit()
+        if node.hits > 0:
+            save(node)
+        else:
+            delete(node)
 
 def list_category_id(subject: str) -> list:
     worlds = subject.split(" ")
@@ -92,5 +125,23 @@ def list_category_id(subject: str) -> list:
 
     return output
     
+def remove_context(subject: str, category_id: int) -> bool:
+    worlds = subject.split(" ")
+    found_words = []
 
+    for idx, w in enumerate(worlds):
+        if re.search(r"^\d+$", w) is not None:
+            continue
     
+        matched = SpendingLogCategory.query.filter(and_(
+            SpendingLogCategory.word == w,
+            SpendingLogCategory.position == idx,
+            SpendingLogCategory.category_id == category_id
+        )).first()
+        if matched is None:
+            continue
+        found_words.append(matched)
+
+    for w in found_words:
+        delete(w)
+    return True 

@@ -13,6 +13,7 @@ from . import (
 
 auth = Blueprint("auth", __name__)
 auth.add_url_rule("/auth/<string:session_name>", methods=["POST"], view_func=auth_controller.login)
+auth.add_url_rule("/telegram-login", methods=["GET"], view_func=auth_controller.telegram_login)
 auth.add_url_rule("/me", methods=["GET"], view_func=auth_controller.me)
 
 chart = Blueprint("chart", __name__)

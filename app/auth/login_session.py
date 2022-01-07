@@ -53,7 +53,7 @@ class LoginSession(db.Model):
 
 def new_login_session(user_id:int) -> LoginSession:
     code = uuid.uuid4()
-    ttl = datetime.now() + timedelta(seconds=5*60)
+    ttl = datetime.now() + timedelta(seconds=2*60)
     otp = random.randint(100000, 999999)
     session = LoginSession(
         user_id = user_id,

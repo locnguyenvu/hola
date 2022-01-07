@@ -1,25 +1,17 @@
 import click
-from flask import current_app
 from flask.cli import with_appcontext
 
 from . import auth_command
 from . import recommendation_command
-
-@click.command("config-set")
-@with_appcontext
-@click.argument("key")
-@click.argument("value")
-def test(key, value):
-    current_app.config[key] = value
-    print(current_app.config.get(key))
+from app.spending.log import new_from_chat_content
 
 @click.command("test")
+@click.argument("content")
 @with_appcontext
-def test():
-    from rich import print
-    print(current_app.config.get("telegram.group.spending_log"))
-    for key in current_app.config.keys():
-        print(key)
+def test(content):
+    from rich import inspect
+    sl = new_from_chat_content(content)
+    inspect(sl)
 
 
 

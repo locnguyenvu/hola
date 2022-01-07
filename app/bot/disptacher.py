@@ -1,3 +1,5 @@
+from typing import Callable
+
 from app.di import get_bot
 from app.user import find_by_telegram_account
 from .message import Message
@@ -14,10 +16,10 @@ class Distpatcher(object):
     def __init__(self):
         pass
 
-    def register_command(self, cmd: str, handler: callable):
+    def register_command(self, cmd: str, handler: Callable):
         self.commands[cmd] = handler
 
-    def register_callback(self, name: str, handler: callable):
+    def register_callback(self, name: str, handler: Callable):
         self.callback_funtions[name] = handler
 
     def is_chat_message(self, payload: dict) -> bool:

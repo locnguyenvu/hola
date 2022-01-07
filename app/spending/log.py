@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from sqlalchemy import and_
 
 from app import exceptions
@@ -7,7 +8,6 @@ import app.spending.category as spendingcategory
 
 db = get_db()
 
-
 TRANSACTION_TYPE_CREDIT = "credit"
 TRANSACTION_TYPE_DEBIT = "debit"
 
@@ -15,6 +15,8 @@ class Log(db.Model):
     __tablename__ = "spending_log"
 
     id = db.Column(db.Integer, primary_key=True)
+    telegram_message_id = db.Column(db.Integer, nullable=True)
+    created_by = db.Column(db.String, nullable=False)
     subject = db.Column(db.String, nullable=False)
     amount = db.Column(db.Float, nullable=False)
     payment_method = db.Column(db.String, nullable=False)
@@ -33,9 +35,31 @@ class Log(db.Model):
             return lcat.display_name
         return None
     
-    def set_amount_str(self, amount:str):
-        if re.search(r"k$") != None:
-            main = amount[0:amount.index("k")]
+    def set_amount_by_string(self, amount:str):
+        carry = 0
+        for i in range(len(amount)):
+            if amount[i].isnumeric():
+                carry = carry * 10
+                carry = carry + int(amount[i])
+
+        # multiply with decimal prefix
+        if amount[-1].isalpha():
+            decimal_prefix = amount[-1]
+            if decimal_prefix == "k":
+                carry = carry * 1000
+            elif decimal_prefix == "M":
+                carry = carry * 1000*1000
+            elif decimal_prefix == "G":
+                carry = carry * 1000*1000*1000
+
+        self.amount = carry
+
+    def is_debit(self) -> bool:
+        return self.transaction_type == TRANSACTION_TYPE_DEBIT
+
+    def is_credit(self) -> bool:
+        return self.transaction_type == TRANSACTION_TYPE_CREDIT
+
 
 
 def find(filters):
@@ -55,7 +79,7 @@ def find(filters):
 
     return query.all()
 
-def find_id(id:int) -> Log:
+def find_id(id) -> Log:
     return Log.query.filter_by(id=id).first()
 
 
@@ -72,7 +96,7 @@ def edit(id:int, payloads):
         setattr(slog, attr, payloads[attr])
     slog.save()
 
-def parse_chat_content(content:str) -> Log:
+def new_from_chat_content(content:str) -> Log:
     
     msg_chunks = content.split(" ")
     amount = None
@@ -95,5 +119,7 @@ def parse_chat_content(content:str) -> Log:
     if re.search(r"c$", amount):
         sl.transaction_type = TRANSACTION_TYPE_CREDIT
         amount = amount.rstrip("c")
+    sl.set_amount_by_string(amount)
+    sl.created_at = datetime.now()
 
     return sl
