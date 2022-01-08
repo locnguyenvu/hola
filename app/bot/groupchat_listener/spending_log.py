@@ -15,7 +15,7 @@ def handle(bot: Bot, message: Message):
         sl = spending_log.new_from_chat_content(message.get_content())
         sl.telegram_message_id = message.id
         sl.created_by = message.sender_username()
-        sl.save()
+        spending_log.save(sl)
         categories = []
         if message.has_option("m"):
             categories = spending_category.list_all()

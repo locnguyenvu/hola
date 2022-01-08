@@ -21,6 +21,7 @@ class Log(db.Model):
     amount = db.Column(db.Float, nullable=False)
     payment_method = db.Column(db.String, nullable=False)
     transaction_type = db.Column(db.String, nullable=False)
+    updated_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, nullable=True)
     spending_category_id = db.Column(db.Integer, nullable=True)
     
@@ -123,3 +124,10 @@ def new_from_chat_content(content:str) -> Log:
     sl.created_at = datetime.now()
 
     return sl
+
+def save(model: Log):
+    if model.created_at is None:
+        model.created_at = datetime.now()
+    model.updated_at = datetime.now()
+    db.session.add(model)
+    db.session.commit()

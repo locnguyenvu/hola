@@ -68,7 +68,7 @@ def tokenize(slog: spending_log.Log):
 
         node = first_or_new(w, idx, slog.spending_category_id)
         node.increase_hit()
-        node.save()
+        save(node)
 
 def detokenize(slog: spending_log.Log):
     worlds = slog.subject.split(" ")

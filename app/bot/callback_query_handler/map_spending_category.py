@@ -13,7 +13,7 @@ def handle(bot: Bot, callback_query: CallbackQuery, log_id:str, category_id:str)
     sc = spending_category.find_id(category_id)
 
     sl.spending_category_id = sc.id
-    sl.save()
+    spending_log.save(sl) 
 
     recommendation_spending_log_category.tokenize(sl)
     bot.edit_message_text(chat_id=callback_query.chat_id(), message_id=callback_query.message_id(), text=f"{sl.subject} -> {sc.display_name}")
