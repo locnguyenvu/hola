@@ -26,6 +26,8 @@ def expense_by_category():
     total_spending_amount = 0
     group_by_category = {}
     for slog in report_logs:
+        if slog.spending_category_id is None:
+            continue
         total_spending_amount += int(slog.amount)
         if slog.spending_category_id not in group_by_category:
             category = spending_category.find_id(slog.spending_category_id)
