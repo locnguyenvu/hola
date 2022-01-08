@@ -87,7 +87,7 @@ def detokenize(slog: spending_log.Log):
         else:
             delete(node)
 
-def list_category_id(subject: str) -> list:
+def list_categories(subject: str) -> list:
     worlds = subject.split(" ")
 
     categories_id = {}
@@ -110,7 +110,7 @@ def list_category_id(subject: str) -> list:
             categories_id[m.category_id] = categories_id[m.category_id] + m.hits
 
     if bool(categories_id) == False:
-        return []
+        return spending_category.list_all()
 
     categories = spending_category.Category.query.filter(spending_category.Category.id.in_(categories_id.keys())).all()
     categories_id_order_by_hits = {k: v for k, v in sorted(categories_id.items(), key=lambda item: item[1], reverse=False)}

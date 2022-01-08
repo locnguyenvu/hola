@@ -1,4 +1,4 @@
-from flask import Blueprint, make_response, request
+from flask import Blueprint, make_response, request, current_app, abort
 
 from .disptacher import Distpatcher
 from .command_handler import (
@@ -21,10 +21,12 @@ dispatcher.register_callback("map_spending_category", map_spending_category_call
 bp = Blueprint("telegram", __name__)
 @bp.route("/telegram", methods=["POST",])
 def telegram():
+    secret = request.args.get("x-bot")
+    if secret is None or secret != current_app.config.get("TELEGRAM_WEBHOOK_SECRET"):
+        return abort(401)
 
     payload = request.get_json(force=True)
-    from rich import print
-    print(payload)
+    
     if payload == None:
         return make_response({"status": "Error"}, 400)
     dispatcher.dispatch(payload)

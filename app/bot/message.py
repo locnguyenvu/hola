@@ -46,6 +46,8 @@ class Message(object):
     }
     """
     def __init__(self, payload: dict):
+        self.options = []
+        self.content = ""
         self.update_id = payload["update_id"]
 
         message = payload["message"]
@@ -53,6 +55,7 @@ class Message(object):
         self.sender = message["from"]
         self.chat = message["chat"]
         self.text = message["text"]
+        self.collect_options()
 
         if "reply_to_message" in message:
             self.reply_to_message = Message({"update_id": self.update_id, "message": message["reply_to_message"]})
@@ -75,7 +78,7 @@ class Message(object):
         return chunks[0].lstrip("/")
 
     def get_content(self) -> str:
-        clean_msg = self.text.strip(" ")
+        clean_msg = self.content.strip(" ")
         return clean_msg
 
     def set_user(self, user: User):
@@ -94,3 +97,20 @@ class Message(object):
 
     def reply_message(self) -> object:
         return self.reply_to_message
+
+    def collect_options(self):
+        mess_chunks = self.text.split(" ")
+        mess_clean = []
+        for word in mess_chunks:
+            if ord(word[0:1]) in (7, 92):
+                self.options.append(word[1:])
+                continue
+            mess_clean.append(word)
+        self.content = " ".join(mess_clean)
+        pass
+
+    def has_option(self, name:str) -> bool:
+        for option in self.options:
+            if option.find(name) >= 0:
+                return True
+        return False

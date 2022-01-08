@@ -29,5 +29,5 @@ $ flask run
 ## For production
 Use uWSGI for web server with Nginx proxy
 ```
-$ env/bin/uwsgi --socket 0.0.0.0:5000 --protocol http wsgi:hola_api
+$ env/bin/uwsgi --enable-threads --socket 0.0.0.0:5000 --protocol http -w wsgi:hola_api
 ```

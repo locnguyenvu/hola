@@ -14,5 +14,6 @@ class Local(object):
 
     TELEGRAM_SECRET = os.getenv("TELEGRAM_SECRET")
     TELEGRAM_AUTH_CALLBACK = os.getenv("TELEGRAM_AUTH_CALLBACK")
-    
+    TELEGRAM_WEBHOOK_SECRET = os.getenv("TELEGRAM_WEBHOOK_SECRET")
+
     WEB_BASE_URL = os.getenv("WEB_BASE_URL")

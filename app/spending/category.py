@@ -55,3 +55,6 @@ def edit(category_id, payload):
         setattr(category, attr, payload[attr])
     category.save()
     return True
+
+def list_all():
+    return Category.query.all()

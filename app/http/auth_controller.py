@@ -53,7 +53,7 @@ def telegram_login():
 
     lsession = login_session.new_login_session(user.id)
     lsession.activate()
-    jwt_sub = "{user_id}.{session_alias}".format(user_id=user.id, session_name=lsession.session_name)
+    jwt_sub = "{user_id}.{session_name}".format(user_id=user.id, session_name=lsession.session_name)
     token = create_access_token(jwt_sub)
     redirect_url = urljoin(request.headers.get('REFERER'), 'oauth/{}'.format(token))
     return redirect(redirect_url)

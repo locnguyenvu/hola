@@ -11,7 +11,7 @@ jobs:
           name: "Install dependencies"
           command: |
             echo $CIRCLE_SHA1
-            docker build -t $DOCKER_REPOSITORY:latest .
+            docker build -t $DOCKER_REPOSITORY:latest --build-arg TIMEZONE=$TIMEZONE .
             echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
             docker push $DOCKER_REPOSITORY:latest
       - run:

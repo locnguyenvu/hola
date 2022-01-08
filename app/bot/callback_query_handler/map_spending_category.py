@@ -18,7 +18,7 @@ def handle(bot: Bot, callback_query: CallbackQuery, log_id:str, category_id:str)
     recommendation_spending_log_category.tokenize(sl)
     bot.edit_message_text(chat_id=callback_query.chat_id(), message_id=callback_query.message_id(), text=f"{sl.subject} -> {sc.display_name}")
     delmesg = threading.Thread(target=lambda: (
-        time.sleep(7),
+        time.sleep(5),
         bot.delete_message(chat_id=callback_query.chat_id(), message_id=callback_query.message_id())
     ), daemon=True)
     delmesg.start()
