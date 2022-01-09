@@ -3,6 +3,7 @@ from flask import make_response, request
 from flask_jwt_extended import jwt_required
 
 import app.spending.log as spending_log
+import app.spending.category as spending_category
 from app import util
 
 @jwt_required()
@@ -66,8 +67,42 @@ def detail(id):
         if edit_payload.get("spending_category_id"):
             log.spending_category_id = edit_payload.get("spending_category_id")
         if edit_payload.get("amount"):
-            log.set_amount_by_string(edit_payload.get("amount"))
+            log.set_amount_by_string(str(edit_payload.get("amount")))
         if edit_payload.get("transaction_type"):
             log.transaction_type = edit_payload.get("transaction_type")
         spending_log.save(log)
         return make_response({'status': 'ok'})
+
+@jwt_required()
+def split(id):
+    print(request)
+    log = spending_log.find_id(id)
+    payload = request.get_json()
+
+    if not payload.get("category_id") or not payload.get("amount"):
+        return make_response({'status': 'error', 'error': 'Invalid data'}, 400)
+
+    scategory = spending_category.find_id(payload.get("category_id"))
+    samount = str(payload.get("amount"))
+
+    new_log = spending_log.Log()
+    new_log.subject = log.subject
+    new_log.set_amount_by_string(samount)
+    new_log.spending_category_id = scategory.id
+    new_log.telegram_message_id = log.telegram_message_id
+    new_log.telegram_chat_id = log.telegram_chat_id
+    new_log.created_by = log.created_by
+    new_log.transaction_type = log.transaction_type
+    new_log.created_at = log.created_at
+
+    if new_log.amount >= log.amount:
+        return make_response({'status': 'error', 'error': 'Split amount exceed quota'}, 400)
+
+    if new_log.amount <= 0:
+        return make_response({'status': 'error', 'error': 'Split amount is invalid'}, 400)
+
+    spending_log.save(new_log)
+
+    log.amount = log.amount - new_log.amount
+    spending_log.save(log)
+    return make_response({'status': 'ok'})
