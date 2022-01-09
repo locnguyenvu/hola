@@ -1,5 +1,6 @@
 import click
 import re
+from flask import current_app
 from flask.cli import AppGroup
 
 from werkzeug.security import generate_password_hash
@@ -23,7 +24,7 @@ def cli_register_user(username):
     print(f'\nSuccess!\n')
     
 
-@cli.command("new_login_session", with_appcontext=True)
+@cli.command("new-login-session", with_appcontext=True)
 @click.argument('username')
 def cli_new_session(username):
     user = find_by_telegram_account(username)
@@ -32,3 +33,9 @@ def cli_new_session(username):
         return
     session = login_session.new_login_session(user.id)
     print(session)
+    login_url = "{web_base_url}/login/{session_name}?otp={otp}".format(
+            web_base_url = current_app.config["WEB_BASE_URL"],
+            session_name = session.session_name,
+            otp = session.otp)
+
+    click.echo(f"Login url: {login_url}")
