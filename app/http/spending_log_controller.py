@@ -4,6 +4,7 @@ from flask_jwt_extended import jwt_required
 
 import app.spending.log as spending_log
 import app.spending.category as spending_category
+import app.recommendation.spending_log_category as recommendation_spending_log_category
 from app import util
 
 @jwt_required()
@@ -102,6 +103,7 @@ def split(id):
         return make_response({'status': 'error', 'error': 'Split amount is invalid'}, 400)
 
     spending_log.save(new_log)
+    recommendation_spending_log_category.tokenize(new_log)
 
     log.amount = log.amount - new_log.amount
     spending_log.save(log)
