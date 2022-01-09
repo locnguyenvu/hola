@@ -16,6 +16,7 @@ class Log(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     telegram_message_id = db.Column(db.Integer, nullable=True)
+    telegram_chat_id = db.Column(db.String, nullable=True)
     created_by = db.Column(db.String, nullable=False)
     subject = db.Column(db.String, nullable=False)
     amount = db.Column(db.Float, nullable=False)
@@ -24,7 +25,7 @@ class Log(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, nullable=True)
     spending_category_id = db.Column(db.Integer, nullable=True)
-    
+
     def save(self):
         db.session.add(self)
         db.session.commit()

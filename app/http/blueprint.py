@@ -23,6 +23,7 @@ chart.add_url_rule("/chart/expense-by-month", view_func=chart_controller.expense
 spending_log = Blueprint("spending_log", __name__)
 spending_log.add_url_rule("/spending-log", view_func=spending_log_controller.index)
 spending_log.add_url_rule("/spending-log/<int:id>", methods=["GET", "PUT"], view_func=spending_log_controller.detail)
+spending_log.add_url_rule("/spending-log/<int:id>/split", methods=["POST"], view_func=spending_log_controller.split)
 
 spending_category = Blueprint("spending_category", __name__)
 spending_category.add_url_rule("/spending-category", methods=["GET", "POST"], view_func=spending_category_controller.index)
