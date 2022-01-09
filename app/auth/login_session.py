@@ -23,6 +23,7 @@ class LoginSession(db.Model):
     session_name = db.Column(db.String, nullable=False)
     otp = db.Column(db.String, nullable=False)
     state = db.Column(db.String, nullable=False)
+    browser_info = db.Column(db.String, nullable=True)
     created_at = db.Column(db.DateTime, nullable=False)
     expired_at = db.Column(db.DateTime, nullable=True)
     invalid_at = db.Column(db.DateTime, nullable=False)
@@ -33,17 +34,15 @@ class LoginSession(db.Model):
 
     def abandon(self):
         self.state = STATE_ABANDONED
-        self.save()
 
-    def activate(self):
+    def activate(self, browser_info: str):
         self.state = STATE_ACTIVE
         self.expired_at = datetime.now() + timedelta(seconds=current_app.config["JWT_ACCESS_TOKEN_EXPIRES"])
         self.otp = "**{}".format(self.otp[2:4])
-        self.save()
+        self.browser_info = browser_info
 
     def terminate(self):
         self.state = STATE_TERMINATED
-        self.save()
 
     def is_expired(self) -> bool:
         if self.state == STATE_ACTIVE:
@@ -63,7 +62,7 @@ def new_login_session(user_id:int) -> LoginSession:
         created_at = datetime.now(),
         invalid_at = ttl,
     )
-    session.save()
+    save(session)
     return session
 
 def find_session_by_name(name:str) -> LoginSession:
@@ -93,3 +92,9 @@ def is_session_expired(name:str) -> bool:
     if sess is None:
         return False
     return sess.is_expired()
+
+def save(model:LoginSession):
+    if model.created_at is None:
+        model.created_at = datetime.now()
+    db.session.add(model)
+    db.session.commit()

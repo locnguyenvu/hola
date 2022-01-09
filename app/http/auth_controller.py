@@ -26,7 +26,8 @@ def login(session_name):
     user = User.query.get(lsession.user_id)
     if user == None or 'pin' not in params or not check_password_hash(user.pin, params['pin']):
         return abort(401)
-    lsession.activate()
+    lsession.activate(params.get("browser_info"))
+    login_session.save(lsession)
     login_session.abandon_session_invalid(user.id)
     jwt_sub = "{user_id}.{session_name}".format(user_id=user.id, session_name=lsession.session_name)
     return make_response({
@@ -52,7 +53,8 @@ def telegram_login():
     user.save()
 
     lsession = login_session.new_login_session(user.id)
-    lsession.activate()
+    lsession.activate("Telegram internal browser")
+    login_session.save(lsession)
     jwt_sub = "{user_id}.{session_name}".format(user_id=user.id, session_name=lsession.session_name)
     token = create_access_token(jwt_sub)
     redirect_url = urljoin(request.headers.get('REFERER'), 'oauth/{}'.format(token))

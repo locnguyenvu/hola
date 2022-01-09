@@ -63,7 +63,7 @@ class Log(db.Model):
 
 
 
-def find(filters):
+def find(filters, order_by_column=None, order_type="asc"):
     query = Log.query
     if 'from_date' in filters and 'to_date' in filters:
         query = query.filter(and_(
@@ -77,6 +77,12 @@ def find(filters):
         if not hasattr(Log, condition) or filters[condition] == None or filters[condition] == '':
             continue
         query = query.filter(getattr(Log, condition)==filters[condition])
+    
+    if order_by_column is not None:
+        if order_type == "asc":
+            query = query.order_by(getattr(Log, order_by_column).asc())
+        elif order_type == "desc":
+            query = query.order_by(getattr(Log, order_by_column).desc())
 
     return query.all()
 

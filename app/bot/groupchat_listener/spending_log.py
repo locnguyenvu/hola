@@ -37,7 +37,7 @@ def handle(bot: Bot, message: Message):
         reply_markup = InlineKeyboardMarkup(keyboard)
         reply_mess = bot.send_message(message.chat_id(), sl.subject, reply_markup=reply_markup)
         delmesg = threading.Thread(target=lambda: (
-            time.sleep(60),
+            time.sleep(20),
             bot.delete_message(message_id=reply_mess.message_id, chat_id=reply_mess.chat_id)
         ), daemon=True)
         delmesg.start()
