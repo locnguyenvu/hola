@@ -13,6 +13,8 @@ class Local(object):
 
     JWT_ACCESS_TOKEN_EXPIRES = 30*86400
 
+    LOCALE = os.getenv("LOCALE", "vi_VN")
+
     SQLALCHEMY_DATABASE_URI=os.getenv("DB_URL")
     SQLALCHEMY_TRACK_MODIFICATIONS=False
 

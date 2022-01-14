@@ -18,7 +18,9 @@ setup(
     ],
     extras_require={
         "dev": [
-            "rich"
+            "rich",
+            "python-dateutil",
+            "alembic"
         ]
     }
 )
