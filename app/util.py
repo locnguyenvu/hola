@@ -2,8 +2,6 @@ import re
 from datetime import datetime
 from calendar import monthrange
 
-NUMERIC_THOUSAND_SEPARATOR = ","
-NUMERIC_DECIMAL_POINT = "."
 
 class Datetime:
 
@@ -53,7 +51,14 @@ class Datetime:
         endtime = Datetime.get_time_range_from_text(f"{start_point.year}-{start_point.month}")
         return ( startime[0], endtime[1])
 
-def parse_str_decimal(input:str) -> float:
-    # remove thousand separator
-    number = input.replace(NUMERIC_THOUSAND_SEPARATOR, "")
-    return float(number)
+
+class strings(object):
+
+    NUMERIC_THOUSAND_SEPARATOR = ","
+    NUMERIC_DECIMAL_POINT = "."
+
+    @classmethod
+    def todecimal(cls, input:str, precision=2) -> float:
+        # remove thousand separator
+        number = input.replace(cls.NUMERIC_THOUSAND_SEPARATOR, "")
+        return round(float(number), precision)

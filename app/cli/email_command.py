@@ -1,3 +1,4 @@
+import abc
 import email
 import imaplib
 import click
@@ -5,14 +6,27 @@ import traceback
 from email.header import decode_header
 from flask import current_app
 from flask.cli import AppGroup
-from rich import print, inspect
-import app.investment.dcvfm.email as dcvfm_email
+import app.investment.dcvfm.email as investment_dcvfm_email
+
+class EmailParser(abc.ABCMeta):
+    @classmethod
+    def __subclasshook__(cls, subclass):
+        return (hasattr(subclass, 'process') and 
+                callable(subclass.process))
+
+
+def get_parser(email_address:str) -> EmailParser:
+    mailbox_reader = {
+        investment_dcvfm_email.SUBSCRIPTION_EMAIL: investment_dcvfm_email.DcvfmSubscriptionConfirmation
+    }
+    if email_address not in mailbox_reader:
+        raise ValueError("Unregister mailbox!")
+    return mailbox_reader[email_address]
 
 cli = AppGroup('email')
 
 @cli.command("read", with_appcontext=True)
 def read():
-
     server = imaplib.IMAP4_SSL(current_app.config.get("EMAIL_HOST"))
     server.login(current_app.config.get("EMAIL_ACCOUNT"), current_app.config.get("EMAIL_PASSWORD"))
 
@@ -54,21 +68,12 @@ def read():
                 print("From: " + mail_from)
                 print("To: " + mail_to)
                 print("Subject: " + subject)
+                print("======================")
 
-                if email_message.is_multipart():
-                    for part in email_message.walk():
-                        content_type = part.get_content_type()
-                        if content_type == "text/html":
-                            body = part.get_payload(decode=True)
-                            if mail_to == dcvfm_email.SUBSCRIPTION_EMAIL:
-                                subscription_result = dcvfm_email.parse_email_content(body)
-                                inspect(subscription_result)
-
-            except dcvfm_email.InvalidEmail as e:
-                print(type(e))
+                handler_class = get_parser(mail_to)
+                handler = handler_class(email_message)
+                handler.process()
             except Exception as e:
                 print(type(e))
-                print(traceback.print_exc())
 
     return
-

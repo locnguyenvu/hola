@@ -28,7 +28,6 @@ def spending_log_tokenize_by_bulk_log(from_time):
 @cli_spendinglog.command("list-category-id", with_appcontext=True)
 @click.argument("subject")
 def spending_log_list_category_id(subject):
-    from rich import print
     categories = recommendation_spending_log_category.list_categories(subject)
     for cat in categories:
         print(f"{cat.id:>3}. {cat.display_name}")
@@ -37,7 +36,6 @@ def spending_log_list_category_id(subject):
 @cli_spendinglog.command("remove-context", with_appcontext=True)
 @click.argument("subject")
 def spending_log_remove_context(subject):
-    from rich import print
     categories = recommendation_spending_log_category.list_categories(subject)
     for cat in categories:
         print(f"{cat.id:>3}. {cat.display_name}")
