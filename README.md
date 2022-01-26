@@ -34,6 +34,11 @@ $ env/bin/uwsgi --enable-threads --socket 0.0.0.0:5000 --protocol http -w wsgi:h
 
 # Migration
 Use [Alembic](https://alembic.sqlalchemy.org/en/latest/)
+Create new migration
+```
+alembic revision -m "<migration_name>"
+```
+
 Upgrade
 ```
 alembic upgrade +1

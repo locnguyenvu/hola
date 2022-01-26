@@ -31,7 +31,7 @@ def read():
     server.login(current_app.config.get("EMAIL_ACCOUNT"), current_app.config.get("EMAIL_PASSWORD"))
 
     server.select("INBOX")
-    status, data = server.search(None, 'ALL')
+    status, data = server.search(None, 'UNSEEN')
     if status != "OK":
         click.echo("Failed to search unseen mail")
         return
