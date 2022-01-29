@@ -22,3 +22,13 @@ class Fund(db.Model):
 def list_dcfvm():
     query = Fund.query.filter_by(group=DCVFM)
     return query.all()
+
+def find_dcvfm_by_code(code:str) -> Fund:
+    query = Fund.query \
+            .where(Fund.group == DCVFM) \
+            .where(Fund.name_short == code)
+    return query.first()
+
+def find_by_code(code:str) -> Fund:
+    query = Fund.query.filter_by(name_short=code)
+    return query.first()
