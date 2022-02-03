@@ -17,6 +17,7 @@ class FundNavPriceHistory(db.Model):
     price = db.Column("price", db.Numeric(10, 2), nullable=False)
     net_change = db.Column("net_change", db.Numeric(10, 2), nullable=False)
     probation_change = db.Column("probation_change", db.Numeric(10, 2), nullable=False)
+    is_active = db.Column("is_active", db.Integer, default=0)
     created_at = db.Column("created_at", db.DateTime, server_default="NOW()")
 
     def __init__(self, fund:Fund):
@@ -37,4 +38,13 @@ def create(model:FundNavPriceHistory):
     if model.created_at is None:
         model.created_at = datetime.now()
     db.session.add(model)
+    db.session.commit()
+
+def mark_active_price(fund:Fund):
+    latest_price = FundNavPriceHistory.query.filter_by(fund_id=fund.id).order_by(FundNavPriceHistory.dealing_date.desc()).first()
+    latest_price.is_active = 1
+    fund.nav_price = latest_price.price
+
+    db.session.add(latest_price)
+    db.session.add(fund)
     db.session.commit()

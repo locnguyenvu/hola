@@ -3,6 +3,7 @@ from flask import Blueprint
 from . import (
     auth_controller,
     chart_controller,
+    investment_controller,
     spending_category_controller,
     spending_log_controller,
     spending_method_controller,
@@ -38,3 +39,6 @@ spending_tag.add_url_rule("/spending-tag/<int:tag_id>", methods=["GET", "POST"],
 
 user = Blueprint("user", __name__)
 user.add_url_rule("/user", view_func=user_controller.index)
+
+investment = Blueprint("investment", __name__)
+investment.add_url_rule("/investment", view_func=investment_controller.index)

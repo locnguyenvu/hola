@@ -27,6 +27,7 @@ def upgrade():
         sa.Column("price", sa.Numeric(10, 2), nullable=False),
         sa.Column("net_change", sa.Numeric(10, 2), nullable=False),
         sa.Column("probation_change", sa.Numeric(10, 2), nullable=False),
+        sa.Column("is_active", sa.Integer, default=0),
         sa.Column("created_at", sa.DateTime, server_default="NOW()")
     )
     op.create_index( "idx_ifnph_dealing_date", "investment_fund_nav_price_history", ["dealing_date"])

@@ -22,5 +22,4 @@ def dcvfm_nav_price_history(fund_name):
         pricechange_m.probation_change = row["probation_change"]
         fund_nav_price_history.create(pricechange_m)
 
-    #print(fnd)
-    #print(result)
+    fund_nav_price_history.mark_active_price(fund_m)

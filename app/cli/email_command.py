@@ -2,7 +2,6 @@ import abc
 import email
 import imaplib
 import click
-import traceback
 from email.header import decode_header
 from flask import current_app
 from flask.cli import AppGroup
@@ -17,7 +16,8 @@ class EmailParser(abc.ABCMeta):
 
 def get_parser(email_address:str) -> EmailParser:
     mailbox_reader = {
-        investment_dcvfm_email.SUBSCRIPTION_EMAIL: investment_dcvfm_email.DcvfmSubscriptionConfirmation
+        investment_dcvfm_email.SUBSCRIPTION_EMAIL: investment_dcvfm_email.DcvfmSubscriptionConfirmation,
+        investment_dcvfm_email.REDEMPTION_EMAIL: investment_dcvfm_email.DcvfmRedemptionConfirmation
     }
     if email_address not in mailbox_reader:
         raise ValueError("Unregister mailbox!")
@@ -74,6 +74,6 @@ def read():
                 handler = handler_class(email_message)
                 handler.process()
             except Exception as e:
-                print(type(e))
+                print("{}".format(e))
 
     return

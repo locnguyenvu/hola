@@ -25,7 +25,7 @@ class FundCertificateSubscription(db.Model):
         self.fund_id = fund.id
         self.fund_code = fund.name_short
 
-def save(model:FundCertificateSubscription):
+def create(model:FundCertificateSubscription):
     # Prevent duplication
     existed = FundCertificateSubscription.query \
             .where( FundCertificateSubscription.fund_id == model.fund_id) \
