@@ -31,3 +31,20 @@ Use uWSGI for web server with Nginx proxy
 ```
 $ env/bin/uwsgi --enable-threads --socket 0.0.0.0:5000 --protocol http -w wsgi:hola_api
 ```
+
+# Migration
+Use [Alembic](https://alembic.sqlalchemy.org/en/latest/)
+Create new migration
+```
+alembic revision -m "<migration_name>"
+```
+
+Upgrade
+```
+alembic upgrade +1
+```
+
+Downgrade
+```
+alembic downgrade -1
+```

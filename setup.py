@@ -14,6 +14,14 @@ setup(
         "uWSGI",
         "python-telegram-bot",
         "python-dotenv",
-        "rich"
-    ]
+        "beautifulsoup4",
+        "requests"
+    ],
+    extras_require={
+        "dev": [
+            "rich",
+            "python-dateutil",
+            "alembic"
+        ]
+    }
 )

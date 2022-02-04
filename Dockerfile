@@ -6,10 +6,16 @@ WORKDIR /src
 COPY setup.py .
 RUN apk add --no-cache --virtual .build-deps g++ libffi-dev openssl-dev tzdata
 ENV TZ $TIMEZONE
-RUN python -m pip install -e . 
+RUN python -m pip install -e . && \
+    python -m pip install supervisor
 
 COPY config.py .
 COPY wsgi.py .
 COPY app ./app
 
-CMD ["uwsgi", "--enable-threads", "--socket", "0.0.0.0:5000", "--protocol", "http", "-w","wsgi:hola_api"]
+COPY docker/crontab /var/spool/cron/crontabs/root
+COPY docker/supervisor.d/ supervisor.d
+COPY docker/supervisord.conf /etc/supervisord.conf
+COPY docker/entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT [ "/bin/sh", "-c", "/entrypoint.sh" ]
