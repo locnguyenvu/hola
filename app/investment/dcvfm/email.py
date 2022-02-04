@@ -2,7 +2,6 @@ import bs4
 from datetime import datetime
 from flask import current_app
 from email.message import Message
-from rich import print
 
 import app.investment.fund as investment_fund
 from app.investment import fund_certificate_subscription as fcs, fund_certificate_redemption as fcr

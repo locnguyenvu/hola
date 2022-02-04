@@ -33,6 +33,6 @@ class ajax(object):
                 "dealing_date": datetime.strptime(columns[1].text, "%d/%m/%Y"),
                 "nav_price": util.strings.vntodecimal(columns[2].text),
                 "net_change": util.strings.todecimal(columns[3].text),
-                "probation_change": columns[4].text,
+                "probation_change": float(columns[4].text.replace("%", "")),
             })
         return price_histories
