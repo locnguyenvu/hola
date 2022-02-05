@@ -2,10 +2,10 @@ from telegram import Bot, ParseMode
 
 import app.spending.log as spending_log
 from app.bot.message import Message
-from app.util import Datetime
+from app.util import dt
 
 def handle(bot: Bot, message: Message):
-    timespan = Datetime.get_time_range_from_text(Datetime.CURRENT_MONTH)
+    timespan = dt.time_range_from_text(dt.CURRENT_MONTH)
     
     slogs = spending_log.find({
         "from_date": timespan[0],
