@@ -13,7 +13,7 @@ REDEMPTION_EMAIL = current_app.config.get("investment.dcvfm.redemption_email")
 class InvalidEmailException(Exception):
     pass
 
-class DcvfmSubscriptionConfirmation:
+class DcvfmSubscriptionConfirmation():
 
     def __init__(self, email_message: Message):
         self.email_message = email_message
@@ -77,7 +77,7 @@ class DcvfmSubscriptionConfirmation:
         pass
 
 
-class DcvfmRedemptionConfirmation:
+class DcvfmRedemptionConfirmation():
 
     def __init__(self, email_message: Message):
         self.email_message = email_message

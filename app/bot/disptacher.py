@@ -2,9 +2,10 @@ from typing import Callable
 
 from app.di import get_bot
 from app.user import find_by_telegram_account
+from .chat_context import find_active as find_active_context, save as save_context
 from .message import Message
 from .callback_query import CallbackQuery
-from .groupchat_listener import spending_log
+from .groupchat import spending_log
 
 bot = get_bot()
 class Distpatcher(object):
@@ -55,6 +56,12 @@ class Distpatcher(object):
                     break
             return
         
+        ctx = find_active_context(str(message.sender_id()), str(message.chat_id()))
+        if ctx:
+            ctx.handle(bot, message)
+            save_context(ctx)
+            return 
+
         if message.is_from_spending_group():
             spending_log.handle(bot, message)
             return 

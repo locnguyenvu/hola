@@ -21,7 +21,7 @@ def upgrade():
         "income_log",
         sa.Column("id", sa.Integer, primary_key=True, nullable=False),
         sa.Column("subject", sa.String, nullable=False),
-        sa.Column("amount", sa.Numeric(10,2), nullable=False),
+        sa.Column("amount", sa.Numeric(14,2), nullable=False),
         sa.Column("created_at", sa.DateTime, server_default="NOW()"),
         sa.Column("updated_at", sa.DateTime),
     )
