@@ -1,8 +1,7 @@
 from flask import request, make_response
 from flask_jwt_extended import jwt_required
-from datetime import datetime
 
-from app.util import Datetime
+from app.util import dt 
 import app.spending.log as spending_log
 import app.spending.category as spending_category
 
@@ -10,13 +9,13 @@ import app.spending.category as spending_category
 @jwt_required()
 def expense_by_category():
     if request.args.get('timerange') is not None:
-        timespan = Datetime.get_time_range_from_text(request.args.get('timerange'))
+        timespan = dt.time_range_from_text(request.args.get('timerange'))
     elif request.args.get("from_month") is not None and request.args.get("to_month") is not None:
-        from_timespan = Datetime.get_time_range_from_text(request.args.get("from_month"))
-        to_timespan = Datetime.get_time_range_from_text(request.args.get("to_month"))
+        from_timespan = dt.time_range_from_text(request.args.get("from_month"))
+        to_timespan = dt.time_range_from_text(request.args.get("to_month"))
         timespan = (from_timespan[0], to_timespan[1],)
     else:
-        timespan = Datetime.get_time_range_from_text('current_month')
+        timespan = dt.time_range_from_text('current_month')
     
     report_logs = spending_log.find({
         "from_date": timespan[0],
@@ -60,11 +59,11 @@ def expense_by_month():
     months = 6
     starting_month = None 
     if request.args.get('months') is not None:
-        months = Datetime.get_time_range_from_text(request.args.get('timerange'))
+        months = dt.time_range_from_text(request.args.get('timerange'))
     if request.args.get('starting_month') is not None:
         starting_month = request.args.get('starting_month')
 
-    timespan = Datetime.get_time_range_in_past_month(months, starting_month=starting_month)
+    timespan = dt.time_range_in_past_month(months, starting_month=starting_month)
     
     report_logs = spending_log.find({
         "from_date": timespan[0],

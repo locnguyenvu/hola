@@ -19,13 +19,13 @@ def index():
 
     if timespan is None:
         if  request.args.get("timerange") is not None:
-            timespan = util.Datetime.get_time_range_from_text(request.args.get("timerange"))
+            timespan = util.dt.time_range_from_text(request.args.get("timerange"))
         elif request.args.get("from_month") is not None and request.args.get("to_month") is not None:
-            from_timespan = util.Datetime.get_time_range_from_text(request.args.get("from_month"))
-            to_timespan = util.Datetime.get_time_range_from_text(request.args.get("to_month"))
+            from_timespan = util.dt.time_range_from_text(request.args.get("from_month"))
+            to_timespan = util.dt.time_range_from_text(request.args.get("to_month"))
             timespan = (from_timespan[0], to_timespan[1],)
         if timespan is None or len(timespan) == 0:
-            timespan = util.Datetime.get_time_range_from_text("today")
+            timespan = util.dt.time_range_from_text("today")
     
     filters = {
         "from_date": timespan[0],

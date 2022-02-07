@@ -2,21 +2,20 @@ import re
 from datetime import datetime
 from calendar import monthrange
 
-
-class Datetime:
+class dt(object):
 
     TODAY = "today"
     CURRENT_MONTH = "current_month"
 
-    @staticmethod
-    def get_time_range_from_text(description) -> tuple:
-        if description == Datetime.TODAY:
+    @classmethod
+    def time_range_from_text(cls, description) -> tuple:
+        if description == cls.TODAY:
             carrytime = datetime.today()
             return (
                 datetime(carrytime.year, carrytime.month, carrytime.day, 0, 0, 0),
                 datetime(carrytime.year, carrytime.month, carrytime.day, 23, 59, 59)
             )
-        if description == Datetime.CURRENT_MONTH:
+        if description == cls.CURRENT_MONTH:
             carrytime = datetime.today()
             month_range = monthrange(carrytime.year, carrytime.month)
             return (
@@ -33,8 +32,8 @@ class Datetime:
 
         return tuple()
 
-    @staticmethod
-    def get_time_range_in_past_month(months, starting_month=None) -> tuple:
+    @classmethod
+    def time_range_in_past_month(cls, months, starting_month=None) -> tuple:
         if starting_month is not None and re.match(r"^\d{4}\-\d{1,2}$", starting_month) is not None:
             year, month = map(lambda e: int(e), starting_month.split("-"))
             start_point = datetime(year, month, 1)
@@ -47,10 +46,9 @@ class Datetime:
             target_month = 12 - abs(target_month)
             target_year -= 1
 
-        startime = Datetime.get_time_range_from_text(f"{target_year}-{target_month}")
-        endtime = Datetime.get_time_range_from_text(f"{start_point.year}-{start_point.month}")
+        startime = cls.time_range_from_text(f"{target_year}-{target_month}")
+        endtime = cls.time_range_from_text(f"{start_point.year}-{start_point.month}")
         return ( startime[0], endtime[1])
-
 
 class strings(object):
 
@@ -79,3 +77,11 @@ class strings(object):
         else:
             number = number_part
         return round(float(number), precision)
+
+class numeric(object):
+
+    DECIMAL_PRECISION = 2
+
+    @classmethod
+    def floatval(cls, number, digit: int = DECIMAL_PRECISION) -> float:
+        return round(float(number), digit)

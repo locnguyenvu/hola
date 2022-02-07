@@ -1,22 +1,28 @@
 from flask import Blueprint, make_response, request, current_app, abort
 
 from .disptacher import Distpatcher
-from .command_handler import (
-        login_handler,
-        spending_thismonth_handler,
-        spending_today_handler,
-        telegram_login_handler,
-    )
-from .callback_query_handler import map_spending_category_callback
+from .command import (
+    login,
+    income_input,
+    reconcile_account,
+    spending_thismonth,
+    spending_today,
+    telegram_login,
+)
+from .callbackquery import (
+    map_spending_category
+)
 
 dispatcher = Distpatcher()
 
-dispatcher.register_command("login", login_handler)
-dispatcher.register_command("tlogin", telegram_login_handler)
-dispatcher.register_command("td", spending_today_handler)
-dispatcher.register_command("tm", spending_thismonth_handler)
+dispatcher.register_command("login", login.handle)
+dispatcher.register_command("tlogin", telegram_login.handle)
+dispatcher.register_command("td", spending_today.handle)
+dispatcher.register_command("tm", spending_thismonth.handle)
+dispatcher.register_command("ii", income_input.handle)
+dispatcher.register_command("ra", reconcile_account.handle)
 
-dispatcher.register_callback("map_spending_category", map_spending_category_callback)
+dispatcher.register_callback("map_spending_category", map_spending_category.handle)
 
 bp = Blueprint("telegram", __name__)
 @bp.route("/telegram", methods=["POST",])
