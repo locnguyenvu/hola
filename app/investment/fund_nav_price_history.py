@@ -41,9 +41,12 @@ def create(model:FundNavPriceHistory):
     db.session.commit()
 
 def mark_active_price(fund:Fund):
+    FundNavPriceHistory.query.filter_by(fund_id=fund.id, is_active=1).update({"is_active": 0})
+
     latest_price = FundNavPriceHistory.query.filter_by(fund_id=fund.id).order_by(FundNavPriceHistory.dealing_date.desc()).first()
     latest_price.is_active = 1
     fund.nav_price = latest_price.price
+    fund.updated_at = datetime.now()
 
     db.session.add(latest_price)
     db.session.add(fund)
