@@ -24,21 +24,28 @@ class FundNavPriceHistory(db.Model):
         self.fund_id = fund.id
         self.fund_code = fund.name_short
 
+    def __str__(self) -> str:
+        change_symbol = "▴"
+        if self.net_change < 0:
+            change_symbol = "▿"
+        
+        return "{:<6} {:>7,} ({}{}%)".format(self.fund_code.upper(), self.price, change_symbol, abs(self.probation_change))
+
 def create(model:FundNavPriceHistory):
-    # Prevent duplication
+    if existed(model):
+        return
+    model.created_at = datetime.now()
+    db.session.add(model)
+    db.session.commit()
+
+def existed(model:FundNavPriceHistory) -> bool:
     existed = FundNavPriceHistory.query \
             .where(FundNavPriceHistory.fund_id == model.fund_id) \
             .where(FundNavPriceHistory.fund_code == model.fund_code) \
             .where(FundNavPriceHistory.dealing_date == model.dealing_date) \
             .where(FundNavPriceHistory.price == model.price) \
             .first()
-    if existed != None:
-        return
-
-    if model.created_at is None:
-        model.created_at = datetime.now()
-    db.session.add(model)
-    db.session.commit()
+    return existed != None
 
 def mark_active_price(fund:Fund):
     FundNavPriceHistory.query.filter_by(fund_id=fund.id, is_active=1).update({"is_active": 0})

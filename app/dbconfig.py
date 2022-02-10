@@ -16,3 +16,13 @@ def load_dbconfig(app):
     records = DbConfig.query.all()
     for reco in records:
         app.config[reco.path] = reco.value
+
+def get(key:str):
+    return DbConfig.query.filter_by(path=key).first()
+
+def get_bulk(keys:list) -> dict:
+    resultset = DbConfig.query.filter(DbConfig.path.in_(keys)).all()
+    configs = {}
+    for row in resultset:
+        configs[row.path] = row.value
+    return configs

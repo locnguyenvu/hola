@@ -20,6 +20,11 @@ $ souce env/bin/activate # Enter virtualenv
 $ pip install -e .
 ```
 
+Install with dev tools `rich` `alembic`
+```
+$ pip install -e ".[dev]"
+```
+
 ## For development
 ```
 $ source FLASK_APP=api
