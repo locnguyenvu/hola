@@ -1,7 +1,6 @@
 from ast import Sub
 from flask.cli import AppGroup
 from click import argument
-from rich import print, inspect
 from sqlalchemy import text
 
 import app.channel
