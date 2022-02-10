@@ -23,7 +23,13 @@ def list_dcfvm():
     query = Fund.query.filter_by(group=DCVFM)
     return query.all()
 
-def find_dcvfm_by_code(code:str) -> Fund:
+def find_dcvfm_by_code(code:str):
+    query = Fund.query \
+            .where(Fund.group == DCVFM) \
+            .where(Fund.name_short == code)
+    return query.all()
+
+def get_dcvfm_by_code(code:str) -> Fund:
     query = Fund.query \
             .where(Fund.group == DCVFM) \
             .where(Fund.name_short == code)
