@@ -4,6 +4,7 @@ from sqlalchemy import and_
 
 from app import exceptions
 from app.di import get_db
+from app.util import strings
 import app.spending.category as spendingcategory
 
 db = get_db()
@@ -38,23 +39,7 @@ class Log(db.Model):
         return None
     
     def set_amount_by_string(self, amount:str):
-        carry = 0
-        for i in range(len(amount)):
-            if amount[i].isnumeric():
-                carry = carry * 10
-                carry = carry + int(amount[i])
-
-        # multiply with decimal prefix
-        if amount[-1].isalpha():
-            decimal_prefix = amount[-1]
-            if decimal_prefix == "k":
-                carry = carry * 1000
-            elif decimal_prefix == "M":
-                carry = carry * 1000*1000
-            elif decimal_prefix == "G":
-                carry = carry * 1000*1000*1000
-
-        self.amount = carry
+        self.amount = strings.toint_sipostfix(amount)
 
     def is_debit(self) -> bool:
         return self.transaction_type == TRANSACTION_TYPE_DEBIT

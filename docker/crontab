@@ -1,7 +1,4 @@
 # do daily/weekly/monthly maintenance
 # min	hour	day	    month	weekday	command
-0       16      *       *       *       flask email read
-0       16      *       *       *       flask crawler dcvfm-nav-price-history dcds
-0       16      *       *       *       flask crawler dcvfm-nav-price-history dcbc
-0       16      *       *       *       flask crawler dcvfm-nav-price-history dcbf
-0       16      *       *       *       flask crawler dcvfm-nav-price-history dcip
+*/15    *       *       *       *       flask email read
+*/15    *       *       *       *       flask crawler dcvfm-nav-price-history

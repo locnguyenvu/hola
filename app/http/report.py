@@ -23,7 +23,7 @@ def summary_by_month():
 @jwt_required()
 def investment_all():
     return make_response({
-        "data": app.report.investment.all()
+        "data": app.report.investment.overview()
     })
 
 @jwt_required()

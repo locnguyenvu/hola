@@ -1,12 +1,12 @@
-from . import blueprint
+from .blueprint import *
 
 def init_app(app):
-    app.register_blueprint(blueprint.auth)
-    app.register_blueprint(blueprint.chart)
-    app.register_blueprint(blueprint.report)
-    app.register_blueprint(blueprint.spending_category)
-    app.register_blueprint(blueprint.spending_log)
-    app.register_blueprint(blueprint.spending_method)
-    app.register_blueprint(blueprint.spending_tag)
-    app.register_blueprint(blueprint.user)
+    app.register_blueprint(auth_routes)
+    app.register_blueprint(chart_routes)
+    app.register_blueprint(report_routes)
+    app.register_blueprint(spending_category_routes)
+    app.register_blueprint(spending_log_routes)
+    app.register_blueprint(spending_method_routes)
+    app.register_blueprint(spending_tag_routes)
+    app.register_blueprint(user_routes)
 

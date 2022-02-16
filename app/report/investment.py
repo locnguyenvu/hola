@@ -3,7 +3,7 @@ from app.investment.fund import Fund
 from app.investment.fund_certificate_subscription import FundCertificateSubscription
 from app.investment.fund_certificate_redemption import FundCertificateRedemption
 
-def all() -> dict:
+def overview() -> dict:
     subscriptions = FundCertificateSubscription.query.all()
     redemptions = FundCertificateRedemption.query.all()
     fund_ids = list(set(map(lambda sub: sub.fund_id, subscriptions)))
@@ -39,6 +39,7 @@ def all() -> dict:
     return {
         "net_value": net_value,
         "current_value": current_value,
+        "net_interest": (current_value - net_value),
         "interest_rate": "{:.2f}%".format((current_value - net_value)/ net_value * 100),
         "detail": list(fund_dict.values()),
     }
