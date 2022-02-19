@@ -60,12 +60,14 @@ class strings(object):
 
     @classmethod
     def todecimal(cls, input:str, precision=2) -> float:
-        # remove thousand separator
+        """
+        Convert 76,098.37 => float(76098.37)
+        """
         number = input.replace(cls.GENERAL_THOUSAND_SEPARATOR, "")
         return round(float(number), precision)
 
     @classmethod
-    def vntodecimal(cls, input:str, precision=2) -> float:
+    def todecimal_dotts(cls, input:str, precision=2) -> float:
         """
         Convert 76.098,37 => float(76098.37)
         """
@@ -77,6 +79,28 @@ class strings(object):
         else:
             number = number_part
         return round(float(number), precision)
+
+    @classmethod
+    def toint_sipostfix(cls, input:str) -> int:
+        """
+        Convert 1k => 1_000
+        """
+        carry = 0
+        for i in range(len(input)):
+            if input[i].isnumeric():
+                carry = carry * 10
+                carry = carry + int(input[i])
+
+        # multiply with decimal prefix
+        if input[-1].isalpha():
+            decimal_prefix = input[-1]
+            if decimal_prefix == "k":
+                carry = carry * 1000
+            elif decimal_prefix == "M":
+                carry = carry * 1000_000
+            elif decimal_prefix == "G":
+                carry = carry * 1000_000_000
+        return carry
 
 class numeric(object):
 
