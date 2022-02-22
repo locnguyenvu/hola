@@ -2,9 +2,9 @@ from flask import Blueprint, make_response, request, current_app, abort
 
 from .disptacher import Distpatcher
 from .command import (
+    investment_report,
     login,
     income_input,
-    invest_report,
     reconcile_account,
     spending_thismonth,
     spending_today,
@@ -21,7 +21,7 @@ dispatcher.register_command("tlogin", telegram_login.handle)
 dispatcher.register_command("td", spending_today.handle)
 dispatcher.register_command("tm", spending_thismonth.handle)
 dispatcher.register_command("ii", income_input.handle)
-dispatcher.register_command("ivr", invest_report.handle)
+dispatcher.register_command("ivr", investment_report.handle)
 dispatcher.register_command("ra", reconcile_account.handle)
 
 dispatcher.register_callback("map_spending_category", map_spending_category.handle)
