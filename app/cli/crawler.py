@@ -1,4 +1,5 @@
-import click
+import asyncio
+import click, time
 from flask.cli import AppGroup
 from datetime import datetime
 
@@ -10,19 +11,18 @@ import app.bot.updates_subscriber as bot_updates_subscriber
 bot = get_bot()
 cli = AppGroup("crawler")
 
-@cli.command("dcvfm-nav-price-history")
+@cli.command("dcvfm-nav-history")
 @click.option("-f", "--fund-name")
 def dcvfm_nav_price_history(fund_name):
+    s = time.perf_counter()
     crw = dcvfm_crawler.ajax()
 
     if fund_name != None:
         funds = fund.Fund.query.filter_by(name_short=fund_name.upper(), group=fund.DCVFM).all()
     else:
         funds = fund.list_dcfvm()
-
-    changes = [] 
     for fu in funds:
-        resultset = crw.get_nav_price_history(fu.name_short.lower())
+        resultset = crw.fetch_nav_price_history(fu.name_short.lower())
         for row in resultset:
             p_change = fund_nav_price_history.FundNavPriceHistory(fu)
             p_change.dealing_date = row["dealing_date"]
@@ -30,19 +30,29 @@ def dcvfm_nav_price_history(fund_name):
             p_change.price = row["nav_price"]
             p_change.net_change = row["net_change"]
             p_change.probation_change = row["probation_change"]
-
-            # The result is ordered latest change first
             if fund_nav_price_history.existed(p_change):
                 break
-            fund_nav_price_history.create(p_change)
-            changes.append(str(p_change))
-            
-        fund_nav_price_history.mark_active_price(fu)
+            fund_nav_price_history.save(p_change)
+    elapsed = time.perf_counter() - s
+    print(f"Execute in {elapsed:0.2f} second")
 
-    if len(changes):
-        cur_date = datetime.now()
-        message = ["DCVFM nav price {}".format(cur_date.strftime("%Y-%m-%d")), "{:*<14}".format("*")] + changes 
+@cli.command("dcvfm-nav-latest")
+def dcvfm_nav():
+    s = time.perf_counter()
+    result = asyncio.run(fund_nav_price_history.crawl_latest_all_dcvfm_nav())
+    elapsed = time.perf_counter() - s
+    print(f"Execute in {elapsed:0.2f} second")
+    changes = []
+    for res in result:
+        if not res:
+            continue
+        changes.append(str(res))
 
-        subscribers = bot_updates_subscriber.get_subscribers("investment.dcvfm-nav-price-change")
-        for subscriber in subscribers:
-            bot.send_message(chat_id=subscriber.telegram_userid, text="\n".join(message))
+    if len(changes) == 0:
+        return
+    cur_date = datetime.now()
+    message = ["DCVFM nav price {}".format(cur_date.strftime("%Y-%m-%d")), "{:-<26}".format("-")] + changes 
+
+    subscribers = bot_updates_subscriber.get_subscribers("investment.dcvfm-nav-price-change")
+    for subscriber in subscribers:
+        bot.send_message(chat_id=subscriber.telegram_userid, text="\n".join(message))

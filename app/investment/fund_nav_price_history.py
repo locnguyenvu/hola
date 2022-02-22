@@ -1,7 +1,9 @@
+import aiohttp, asyncio
 from datetime import datetime
 from app.di import get_db
 
-from .fund import Fund
+from .fund import Fund, list_dcfvm
+from .dcvfm import crawler as dcvfm_crawler
 
 db = get_db()
 
@@ -31,10 +33,9 @@ class FundNavPriceHistory(db.Model):
         
         return "{:<6} {:>7,} ({}{}%)".format(self.fund_code.upper(), self.price, change_symbol, abs(self.probation_change))
 
-def create(model:FundNavPriceHistory):
-    if existed(model):
-        return
-    model.created_at = datetime.now()
+def save(model:FundNavPriceHistory):
+    if not model.created_at:
+        model.created_at = datetime.now()
     db.session.add(model)
     db.session.commit()
 
@@ -47,14 +48,38 @@ def existed(model:FundNavPriceHistory) -> bool:
             .first()
     return existed != None
 
-def mark_active_price(fund:Fund):
-    FundNavPriceHistory.query.filter_by(fund_id=fund.id, is_active=1).update({"is_active": 0})
+def mark_active(navPrice:FundNavPriceHistory):
+    FundNavPriceHistory.query.filter_by(fund_id=navPrice.fund_id, is_active=1).update({"is_active": 0})
+    Fund.query.filter_by(id=navPrice.fund_id).update({"nav_price": navPrice.price})
+    navPrice.is_active = 1
+    save(navPrice)
 
-    latest_price = FundNavPriceHistory.query.filter_by(fund_id=fund.id).order_by(FundNavPriceHistory.dealing_date.desc()).first()
-    latest_price.is_active = 1
-    fund.nav_price = latest_price.price
-    fund.updated_at = datetime.now()
 
-    db.session.add(latest_price)
-    db.session.add(fund)
-    db.session.commit()
+async def crawl_latest_dcvfm_nav_by_fund(crawler: dcvfm_crawler.ajax, fund:Fund) -> FundNavPriceHistory:
+    resultset = await crawler.afetch_nav_price_history(fund.name_short)
+
+    latest_result = resultset[0]
+    latest_change = FundNavPriceHistory(fund)
+    latest_change.dealing_date = latest_result["dealing_date"]
+    latest_change.update_date = latest_result["update_date"]
+    latest_change.price = latest_result["nav_price"]
+    latest_change.net_change = latest_result["net_change"]
+    latest_change.probation_change = latest_result["probation_change"]
+
+    if not existed(latest_change):
+        mark_active(latest_change)
+        return latest_change
+    return None
+
+
+async def crawl_latest_all_dcvfm_nav():
+    funds = list_dcfvm()
+
+    async with aiohttp.ClientSession() as session:
+        crawler = dcvfm_crawler.ajax(session=session)
+        tasks = []
+        for fund in funds:
+            tasks.append(crawl_latest_dcvfm_nav_by_fund(crawler, fund))
+
+        result = await asyncio.gather(*tasks)
+        return result

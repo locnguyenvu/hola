@@ -15,7 +15,8 @@ setup(
         "python-telegram-bot",
         "python-dotenv",
         "beautifulsoup4",
-        "requests"
+        "requests",
+        "aiohttp",
     ],
     extras_require={
         "dev": [
