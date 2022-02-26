@@ -54,6 +54,9 @@ def mark_active(navPrice:FundNavPriceHistory):
     navPrice.is_active = 1
     save(navPrice)
 
+def find_active_by_fund_ids(fund_ids: list) -> list:
+    query = FundNavPriceHistory.query.filter_by(is_active=1).filter(FundNavPriceHistory.fund_id.in_(fund_ids))
+    return query.all()
 
 async def crawl_latest_dcvfm_nav_by_fund(crawler: dcvfm_crawler.ajax, fund:Fund) -> FundNavPriceHistory:
     resultset = await crawler.afetch_nav_price_history(fund.name_short)
@@ -73,13 +76,14 @@ async def crawl_latest_dcvfm_nav_by_fund(crawler: dcvfm_crawler.ajax, fund:Fund)
 
 
 async def crawl_latest_all_dcvfm_nav():
-    funds = list_dcfvm()
+    funds = list_dcfvm(update_today=False)
 
     async with aiohttp.ClientSession() as session:
         crawler = dcvfm_crawler.ajax(session=session)
         tasks = []
         for fund in funds:
-            tasks.append(crawl_latest_dcvfm_nav_by_fund(crawler, fund))
+            if not fund.has_updated_today():
+                tasks.append(crawl_latest_dcvfm_nav_by_fund(crawler, fund))
 
         result = await asyncio.gather(*tasks)
         return result
