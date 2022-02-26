@@ -1,3 +1,6 @@
+from calendar import month
+from datetime import datetime
+from turtle import update
 from app.di import get_db
 
 db = get_db()
@@ -16,10 +19,23 @@ class Fund(db.Model):
     group = db.Column(db.String(100), nullable=False)
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
+    update_weekday = db.Column(db.String(7))
+
+    def has_updated_today(self) -> bool:
+        today = datetime.today()
+        return today.year == self.updated_at.year \
+            and today.month == self.updated_at.month \
+            and today.day == self.updated_at.day
 
 
-def list_dcfvm():
+def list_dcfvm(update_today=True):
     query = Fund.query.filter_by(group=DCVFM)
+    if update_today:
+        today = datetime.today()
+        weekday_index = ['_'] * 7
+        weekday_index[today.weekday()] = "1"
+        query = query.filter(Fund.update_weekday.like("".join(weekday_index)))
+
     return query.all()
 
 def find_dcvfm_by_code(code:str):
