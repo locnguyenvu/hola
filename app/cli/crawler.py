@@ -42,7 +42,7 @@ def dcvfm_nav():
     _ = asyncio.run(fund_nav_price_history.crawl_latest_all_dcvfm_nav())
     elapsed = time.perf_counter() - s
     print(f"Execute in {elapsed:0.2f} second")
-    dcvfm_funds = fund.list_dcfvm(update_today=False)
+    dcvfm_funds = fund.list_dcfvm(update_today=True)
     dcvfm_updates = fund_nav_price_history.find_active_by_fund_ids(list(map(lambda e: e.id, dcvfm_funds)))
     if len(dcvfm_funds) == 0 or len(dcvfm_funds) != len(dcvfm_updates):
         return
