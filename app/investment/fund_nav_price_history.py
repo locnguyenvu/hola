@@ -76,7 +76,7 @@ async def crawl_latest_dcvfm_nav_by_fund(crawler: dcvfm_crawler.ajax, fund:Fund)
 
 
 async def crawl_latest_all_dcvfm_nav():
-    funds = list_dcfvm(update_today=False)
+    funds = list_dcfvm(update_today=True)
 
     async with aiohttp.ClientSession() as session:
         crawler = dcvfm_crawler.ajax(session=session)
