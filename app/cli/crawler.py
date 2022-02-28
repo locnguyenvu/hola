@@ -43,11 +43,12 @@ def dcvfm_nav():
     elapsed = time.perf_counter() - s
     print(f"Execute in {elapsed:0.2f} second")
     dcvfm_funds = fund.list_dcfvm(update_today=True)
-    dcvfm_updates = fund_nav_price_history.find_active_by_fund_ids(list(map(lambda e: e.id, dcvfm_funds)))
-    if len(dcvfm_funds) == 0 or len(dcvfm_funds) != len(dcvfm_updates):
+    dcvfm_update_today = list(filter(lambda e: e.has_updated_today(), dcvfm_funds))
+    if len(dcvfm_funds) == 0 or len(dcvfm_funds) != len(dcvfm_update_today):
         return
+    nav_updates = fund_nav_price_history.find_active_by_fund_ids(list(map(lambda e: e.id, dcvfm_funds)))
 
-    changes = list(map(lambda e: str(e), dcvfm_updates))
+    changes = list(map(lambda e: str(e), nav_updates))
     cur_date = datetime.now()
     message = ["DCVFM nav price {}".format(cur_date.strftime("%Y-%m-%d")), "{:-<26}".format("-")] + changes 
 
