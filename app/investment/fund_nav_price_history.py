@@ -50,7 +50,7 @@ def existed(model:FundNavPriceHistory) -> bool:
 
 def mark_active(navPrice:FundNavPriceHistory):
     FundNavPriceHistory.query.filter_by(fund_id=navPrice.fund_id, is_active=1).update({"is_active": 0})
-    Fund.query.filter_by(id=navPrice.fund_id).update({"nav_price": navPrice.price})
+    Fund.query.filter_by(id=navPrice.fund_id).update({"nav_price": navPrice.price, "updated_at": datetime.now()})
     navPrice.is_active = 1
     save(navPrice)
 

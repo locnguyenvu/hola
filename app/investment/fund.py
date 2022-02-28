@@ -1,6 +1,4 @@
-from calendar import month
 from datetime import datetime
-from turtle import update
 from app.di import get_db
 
 db = get_db()
