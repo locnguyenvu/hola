@@ -39,9 +39,11 @@ def dcvfm_nav_price_history(fund_name):
 @cli.command("dcvfm-nav-latest")
 def dcvfm_nav():
     s = time.perf_counter()
-    _ = asyncio.run(fund_nav_price_history.crawl_latest_all_dcvfm_nav())
+    updates = asyncio.run(fund_nav_price_history.crawl_latest_all_dcvfm_nav())
     elapsed = time.perf_counter() - s
     print(f"Execute in {elapsed:0.2f} second")
+    if len(list(filter(lambda e: e != None, updates))) == 0:
+        return
     dcvfm_funds = fund.list_dcfvm(update_today=True)
     dcvfm_update_today = list(filter(lambda e: e.has_updated_today(), dcvfm_funds))
     if len(dcvfm_funds) == 0 or len(dcvfm_funds) != len(dcvfm_update_today):
