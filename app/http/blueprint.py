@@ -44,3 +44,10 @@ report_routes = Blueprint("report", __name__)
 report_routes.add_url_rule("/report/by-month", view_func=report.summary_by_month)
 report_routes.add_url_rule("/report/investment", view_func=report.investment_all)
 report_routes.add_url_rule("/report/spending", view_func=report.spending_summary_by_interval)
+
+healthcheck_routes = Blueprint("health_check", __name__)
+@healthcheck_routes.route("/health-check", methods=["GET",])
+def health_check():
+    return {
+        "status": "ok"
+    }

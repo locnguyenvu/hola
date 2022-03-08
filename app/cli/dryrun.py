@@ -1,7 +1,5 @@
-from ast import Sub
 from flask.cli import AppGroup
 from click import argument
-from sqlalchemy import text
 
 import app.channel
 import app.bot.updates_subscriber as bot_updates_subscriber

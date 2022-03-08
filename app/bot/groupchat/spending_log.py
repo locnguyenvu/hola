@@ -1,10 +1,8 @@
-import threading
-import time
-
 from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
 from urllib.parse import urlencode
 
 import app.recommendation.spending_log_category as recommendation_spending_log_category
+import app.channel
 import app.spending.log as spending_log
 import app.spending.category as spending_category
 from app.bot.message import Message
@@ -37,17 +35,9 @@ def handle(bot: Bot, message: Message):
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         reply_mess = bot.send_message(message.chat_id(), sl.subject, reply_markup=reply_markup)
-        delmesg = threading.Thread(target=lambda: (
-            time.sleep(10),
-            bot.delete_message(message_id=reply_mess.message_id, chat_id=reply_mess.chat_id)
-        ), daemon=True)
-        delmesg.start()
+        app.channel.broadcast("telegram_delete_message", dict(message_id=reply_mess.message_id, chat_id=reply_mess.chat_id, delay_time=15))
     except ValueError as e:
         bot.delete_message(message_id=message.id, chat_id=message.chat_id()),
         reply_mess = bot.send_message(message.chat_id(), f"❌ {str(e)}")
-        delmesg = threading.Thread(target=lambda: (
-            time.sleep(5),
-            bot.delete_message(message_id=reply_mess.message_id, chat_id=reply_mess.chat_id)
-        ), daemon=True)
-        delmesg.start()
+        app.channel.broadcast("telegram_delete_message", dict(message_id=reply_mess.message_id, chat_id=reply_mess.chat_id, delay_time=5))
     pass

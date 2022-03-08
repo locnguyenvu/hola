@@ -1,8 +1,11 @@
 from .blueprint import *
 
+
+
 def init_app(app):
     app.register_blueprint(auth_routes)
     app.register_blueprint(chart_routes)
+    app.register_blueprint(healthcheck_routes)
     app.register_blueprint(report_routes)
     app.register_blueprint(spending_category_routes)
     app.register_blueprint(spending_log_routes)
