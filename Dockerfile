@@ -12,7 +12,7 @@ RUN python -m pip install -e . && \
 COPY config.py .
 COPY wsgi.py .
 COPY app ./app
-COPY lang .
+COPY lang ./lang
 
 COPY docker/crontab /var/spool/cron/crontabs/root
 COPY docker/supervisor.d/ supervisor.d
