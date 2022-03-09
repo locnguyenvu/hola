@@ -5,6 +5,7 @@ import app.recommendation.spending_log_category as recommendation_spending_log_c
 import app.channel
 import app.spending.log as spending_log
 import app.spending.category as spending_category
+from app.i18n import t
 from app.bot.message import Message
 
 
@@ -36,8 +37,8 @@ def handle(bot: Bot, message: Message):
         reply_markup = InlineKeyboardMarkup(keyboard)
         reply_mess = bot.send_message(message.chat_id(), sl.subject, reply_markup=reply_markup)
         app.channel.broadcast("telegram_delete_message", dict(message_id=reply_mess.message_id, chat_id=reply_mess.chat_id, delay_time=15))
-    except ValueError as e:
+    except ValueError as _:
         bot.delete_message(message_id=message.id, chat_id=message.chat_id()),
-        reply_mess = bot.send_message(message.chat_id(), f"❌ {str(e)}")
+        reply_mess = bot.send_message(message.chat_id(), t("telegram_bot.spending_log_wrong_format"))
         app.channel.broadcast("telegram_delete_message", dict(message_id=reply_mess.message_id, chat_id=reply_mess.chat_id, delay_time=5))
     pass

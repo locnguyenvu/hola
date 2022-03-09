@@ -3,6 +3,7 @@ from click import argument
 
 import app.channel
 import app.bot.updates_subscriber as bot_updates_subscriber
+from app.i18n import t
 
 cli = AppGroup("dry-run")
 @cli.command("broadcast-postgres-channel")
@@ -33,3 +34,7 @@ def delete_subscriber(topic, telegram_userid):
     if not subscriber:
         return
     bot_updates_subscriber.delete(subscriber)
+
+@cli.command("i18n")
+def i18n():
+    print(t("telegram_bot.spending_log_wrong_group_error"))
