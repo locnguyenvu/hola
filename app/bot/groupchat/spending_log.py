@@ -39,6 +39,6 @@ def handle(bot: Bot, message: Message):
         app.channel.broadcast("telegram_delete_message", dict(message_id=reply_mess.message_id, chat_id=reply_mess.chat_id, delay_time=15))
     except ValueError as _:
         bot.delete_message(message_id=message.id, chat_id=message.chat_id()),
-        reply_mess = bot.send_message(message.chat_id(), t("telegram_bot.spending_log_wrong_format"))
+        reply_mess = bot.send_message(message.chat_id(), t("telegram_bot.group_chat.spending_log.error_wrong_format"))
         app.channel.broadcast("telegram_delete_message", dict(message_id=reply_mess.message_id, chat_id=reply_mess.chat_id, delay_time=5))
     pass
