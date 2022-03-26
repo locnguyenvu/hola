@@ -1,3 +1,4 @@
+from datetime import datetime
 from .di import get_db
 
 db = get_db()
@@ -26,3 +27,16 @@ def get_bulk(keys:list) -> dict:
     for row in resultset:
         configs[row.path] = row.value
     return configs
+
+def set(key:str, value):
+    config = DbConfig.query.filter_by(path=key).first()
+    if not config:
+        config = DbConfig()
+        config.path = key
+        config.created_at = datetime.now()
+
+    config.value = value
+    config.updated_at = datetime.now()
+    db.session.add(config)
+    db.session.commit()
+

@@ -90,7 +90,7 @@ class Message(object):
     def is_from_spending_group(self) -> bool:
         if self.chat_id() == self.sender_id():
             return False
-        return str(self.chat_id()) == current_app.config.get("telegram.group.spending_log")
+        return str(self.chat_id()) == str(current_app.config.get("telegram.group.spending_log"))
 
     def is_a_reply(self) -> bool:
         return self.reply_to_message is not None
