@@ -1,5 +1,4 @@
 from typing import Callable
-from flask import current_app
 
 from app.di import get_bot
 from app.user import find_by_telegram_account
