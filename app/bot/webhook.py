@@ -2,9 +2,11 @@ from flask import Blueprint, make_response, request, current_app, abort
 
 from .disptacher import Distpatcher
 from .command import (
+    help,
+    income_input,
+    init_spending_log_group,
     investment_report,
     login,
-    income_input,
     reconcile_account,
     spending_thismonth,
     spending_today,
@@ -16,13 +18,15 @@ from .callbackquery import (
 
 dispatcher = Distpatcher()
 
-dispatcher.register_command("login", login.handle)
-dispatcher.register_command("tlogin", telegram_login.handle)
-dispatcher.register_command("td", spending_today.handle)
-dispatcher.register_command("tm", spending_thismonth.handle)
+dispatcher.register_command("help", help.handle)
 dispatcher.register_command("ii", income_input.handle)
+dispatcher.register_command("init_slg", init_spending_log_group.handle)
 dispatcher.register_command("ivr", investment_report.handle)
+dispatcher.register_command("login", login.handle)
 dispatcher.register_command("ra", reconcile_account.handle)
+dispatcher.register_command("td", spending_today.handle)
+dispatcher.register_command("tlogin", telegram_login.handle)
+dispatcher.register_command("tm", spending_thismonth.handle)
 
 dispatcher.register_callback("map_spending_category", map_spending_category.handle)
 
