@@ -6,7 +6,7 @@ WORKDIR /src
 COPY setup.py .
 RUN apk add --no-cache --virtual .build-deps g++ libffi-dev openssl-dev tzdata
 ENV TZ $TIMEZONE
-RUN python -m pip install -e . && \
+RUN python -m pip install -e ".[production]" && \
     python -m pip install supervisor
 
 COPY config.py .
