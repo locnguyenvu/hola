@@ -6,23 +6,22 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        "psycopg2-binary",
+        "aiohttp",
+        "alembic"
+        "beautifulsoup4",
         "Flask",
         "Flask-JWT-Extended",
         "Flask-SQLAlchemy",
         "flask-cors",
-        "uWSGI",
-        "python-telegram-bot",
         "python-dotenv",
-        "beautifulsoup4",
+        "python-telegram-bot",
+        "psycopg2-binary",
         "requests",
-        "aiohttp",
+        "rich",
     ],
     extras_require={
-        "dev": [
-            "rich",
-            "python-dateutil",
-            "alembic"
+        "production": [
+            "uWSGI",
         ]
     }
 )
