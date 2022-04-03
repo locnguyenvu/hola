@@ -8,9 +8,9 @@ class CommandHandler(object):
 
     @abstractmethod
     def _process(self, message: Message):
-        pass
+        raise NotImplementedError
 
-    def require_authentication() -> bool:
+    def require_authentication(self) -> bool:
         return True
 
     def execute(self, message: Message):

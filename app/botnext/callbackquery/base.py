@@ -7,7 +7,7 @@ class CallbackQueryHandler(object):
 
     @abstractmethod
     def _process(self, query: CallbackQuery):
-        pass
+        raise NotImplementedError
 
     def execute(self, query: CallbackQuery):
         if find_by_telegram_account(query.from_user.username) is None:

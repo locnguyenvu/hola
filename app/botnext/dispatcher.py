@@ -1,6 +1,7 @@
 from .telegram import Message, CallbackQuery
 from .command.base import CommandHandler
 from .callbackquery.base import CallbackQueryHandler
+from .chat_context import find_active as ctx_find_active, save as ctx_save
 from app.di import get_bot
 from typing import Callable
 
@@ -50,6 +51,12 @@ class Dispatcher(object):
                     handler = self.groupchats[str(message.chat.id)]
                     handler.execute(message)
                     return
+
+                chat_ctx = ctx_find_active(str(message.from_user.id), str(message.chat.id))
+                if chat_ctx is not None:
+                    chat_ctx.handle(message)
+                    ctx_save(chat_ctx)
+
             return
 
     pass

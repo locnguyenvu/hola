@@ -13,4 +13,4 @@ class GroupChat(object):
 
     @abstractmethod
     def _process(self, message: Message):
-        pass
+        raise NotImplementedError
