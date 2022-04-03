@@ -2,6 +2,7 @@ import re
 from datetime import datetime
 from calendar import monthrange
 
+
 class dt(object):
 
     TODAY = "today"
@@ -40,26 +41,27 @@ class dt(object):
         else:
             start_point = datetime.today()
 
-        target_year = start_point.year - (months//12)
-        target_month = start_point.month - (months - 12*(months//12))
-        if target_month <= 0 :
+        target_year = start_point.year - (months // 12)
+        target_month = start_point.month - (months - 12 * (months // 12))
+        if target_month <= 0:
             target_month = 12 - abs(target_month)
             target_year -= 1
 
         startime = cls.time_range_from_text(f"{target_year}-{target_month}")
         endtime = cls.time_range_from_text(f"{start_point.year}-{start_point.month}")
-        return ( startime[0], endtime[1])
+        return (startime[0], endtime[1])
+
 
 class strings(object):
 
     GENERAL_THOUSAND_SEPARATOR = ","
     GENERAL_DECIMAL_POINT = "."
 
-    VN_THOUSAND_SEPARATOR = "." 
+    VN_THOUSAND_SEPARATOR = "."
     VN_DECIMAL_POINT = ","
 
     @classmethod
-    def todecimal(cls, input:str, precision=2) -> float:
+    def todecimal(cls, input: str, precision=2) -> float:
         """
         Convert 76,098.37 => float(76098.37)
         """
@@ -67,7 +69,7 @@ class strings(object):
         return round(float(number), precision)
 
     @classmethod
-    def todecimal_dotts(cls, input:str, precision=2) -> float:
+    def todecimal_dotts(cls, input: str, precision=2) -> float:
         """
         Convert 76.098,37 => float(76098.37)
         """
@@ -81,7 +83,7 @@ class strings(object):
         return round(float(number), precision)
 
     @classmethod
-    def toint_sipostfix(cls, input:str) -> int:
+    def toint_sipostfix(cls, input: str) -> int:
         """
         Convert 1k => 1_000
         """
@@ -102,6 +104,7 @@ class strings(object):
                 carry = carry * 1000_000_000
         return carry
 
+
 class numeric(object):
 
     DECIMAL_PRECISION = 2
@@ -109,3 +112,29 @@ class numeric(object):
     @classmethod
     def floatval(cls, number, digit: int = DECIMAL_PRECISION) -> float:
         return round(float(number), digit)
+
+    @classmethod
+    def sipostfix_toint(cls, input: str) -> int:
+        """
+        Convert
+            1k => 1_000
+            1M => 1_000_000
+            1G => 1_000_000_000
+        """
+        carry = 0
+        for i in range(len(input)):
+            if input[i].isnumeric():
+                carry = carry * 10
+                carry = carry + int(input[i])
+
+        # multiply with decimal prefix
+        if input[-1].isalpha():
+            decimal_prefix = input[-1]
+            if decimal_prefix == "k":
+                carry = carry * 1000
+            elif decimal_prefix == "M":
+                carry = carry * 1000_000
+            elif decimal_prefix == "G":
+                carry = carry * 1000_000_000
+        return carry
+    pass

@@ -1,6 +1,7 @@
 from flask import Flask, make_response
 from flask_cors import CORS
 
+
 def create_app():
     app = Flask(__name__)
     CORS(app, resources=r'/*')
@@ -23,7 +24,7 @@ def create_app():
 
         from . import dbconfig
         dbconfig.load_dbconfig(app)
-      
+
         from . import auth, http, cli, bot
         auth.init_app(app)
         http.init_app(app)
