@@ -30,7 +30,7 @@ def overview() -> dict:
 
     for redem in redemptions:
         fund_dict[redem.fund_id]["quantity"] -= redem.quantity
-        net_value -= redem.net_redemption_amount 
+        net_value -= redem.net_redemption_amount
 
     for fid in fund_dict:
         fund_dict[fid]["total_value"] = round(fund_dict[fid]["quantity"] * fund_dict[fid]["nav_price"], 2)
@@ -40,6 +40,6 @@ def overview() -> dict:
         "net_value": net_value,
         "current_value": current_value,
         "net_interest": (current_value - net_value),
-        "interest_rate": "{:.2f}%".format((current_value - net_value)/ net_value * 100),
+        "interest_rate": "{:.2f}%".format((current_value - net_value) / net_value * 100) if current_value > 0 else '0',
         "detail": list(fund_dict.values()),
     }

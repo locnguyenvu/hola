@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from app.botnext.callback_query import CallbackQuery
+from app.botnext.telegram import CallbackQuery
 from app.user import find_by_telegram_account
 
 

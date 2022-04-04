@@ -1,4 +1,4 @@
-from app.botnext.callback_query import CallbackQuery
+from app.botnext.telegram import CallbackQuery
 import app.recommendation.spending_log_category as recommendation_spending_log_category
 import app.spending.log as spending_log
 import app.spending.category as spending_category
