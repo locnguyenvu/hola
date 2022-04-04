@@ -43,9 +43,6 @@ def telegram():
         return abort(401)
 
     payload = request.get_json(force=True)
-    print(payload)
-    mess = Message.de_json(payload["message"], bot)
-    print(mess)
 
 
     if payload == None:
