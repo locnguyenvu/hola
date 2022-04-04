@@ -11,20 +11,21 @@ from werkzeug.security import check_password_hash
 from app.auth import login_session
 from app.user import User, find_by_telegram_account
 
+
 def login(session_name):
     params = request.get_json()
     if params is None:
         return abort(401)
 
     otp = params['otp']
-    if otp == None:
+    if otp is None:
         return abort(401)
 
     lsession = login_session.find_session_by_name(session_name)
-    if lsession == None or lsession.otp != otp:
+    if lsession is None or lsession.otp != otp:
         return abort(401)
     user = User.query.get(lsession.user_id)
-    if user == None or 'pin' not in params or not check_password_hash(user.pin, params['pin']):
+    if user is None or 'pin' not in params or not check_password_hash(user.pin, params['pin']):
         return abort(401)
     lsession.activate(params.get("browser_info"))
     login_session.save(lsession)
@@ -33,6 +34,7 @@ def login(session_name):
     return make_response({
         "token": create_access_token(jwt_sub)
     })
+
 
 def telegram_login():
     query_params = request.args.to_dict()
@@ -48,7 +50,7 @@ def telegram_login():
     jwt_auth_time = int(query_params.get('auth_date') or 0)
     if (current_time - jwt_auth_time) > current_app.config['JWT_ACCESS_TOKEN_EXPIRES'] or user is None:
         return abort(401)
-    
+
     user.session_alias = hash_check
     user.save()
 
@@ -59,6 +61,7 @@ def telegram_login():
     token = create_access_token(jwt_sub)
     redirect_url = urljoin(request.headers.get('REFERER'), 'oauth/{}'.format(token))
     return redirect(redirect_url)
+
 
 @jwt_required()
 def me():
