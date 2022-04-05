@@ -1,9 +1,11 @@
-from .telegram import Message, CallbackQuery
-from .command.base import CommandHandler
+from app.di import get_bot
+from flask import current_app
+from typing import Callable
 from .callbackquery.base import CallbackQueryHandler
 from .chat_context import find_active as ctx_find_active, save as ctx_save
-from app.di import get_bot
-from typing import Callable
+from .command.base import CommandHandler
+from .groupchat.spending_log import SpendingLogGroupChat
+from .telegram import Message, CallbackQuery
 
 bot = get_bot()
 
@@ -26,9 +28,6 @@ class Dispatcher(object):
     def register_callback(self, name: str, handler: CallbackQueryHandler):
         self.callback_queries[name] = handler
 
-    def register_groupchat(self, chat_id: str, handler: Callable):
-        self.groupchats[chat_id] = handler
-
     def dispatch(self, telegram_request: dict):
 
         if "callback_query" in telegram_request:
@@ -47,8 +46,8 @@ class Dispatcher(object):
                 handler.execute(message)
                 return
             else:
-                if str(message.chat.id) in self.groupchats:
-                    handler = self.groupchats[str(message.chat.id)]
+                if str(message.chat.id) == current_app.config.get("telegram.group.spending_log"):
+                    handler = SpendingLogGroupChat()
                     handler.execute(message)
                     return
 
