@@ -15,8 +15,6 @@ class Dispatcher(object):
 
     callback_queries = {}
 
-    groupchats = {}
-
     def __init__(self):
         pass
 
