@@ -15,6 +15,7 @@ STATE_EXPIRED = "expired"
 STATE_ABANDONED = "abandoned"
 STATE_TERMINATED = "terminated"
 
+
 class LoginSession(db.Model):
     __tablename__ = "login_session"
 
@@ -50,22 +51,23 @@ class LoginSession(db.Model):
         return False
 
 
-def new_login_session(user_id:int) -> LoginSession:
+def new_login_session(user_id: int) -> LoginSession:
     code = uuid.uuid4()
-    ttl = datetime.now() + timedelta(seconds=2*60)
+    ttl = datetime.now() + timedelta(seconds=2 * 60)
     otp = random.randint(100000, 999999)
     session = LoginSession(
-        user_id = user_id,
-        session_name = str(code),
-        state = STATE_NEW,
-        otp = otp,
-        created_at = datetime.now(),
-        invalid_at = ttl,
+        user_id=user_id,
+        session_name=str(code),
+        state=STATE_NEW,
+        otp=otp,
+        created_at=datetime.now(),
+        invalid_at=ttl,
     )
     save(session)
     return session
 
-def find_session_by_name(name:str) -> LoginSession:
+
+def find_session_by_name(name: str) -> LoginSession:
     query = LoginSession.query.filter(and_(
         LoginSession.session_name == name,
         LoginSession.invalid_at >= datetime.now(),
@@ -73,7 +75,8 @@ def find_session_by_name(name:str) -> LoginSession:
     ))
     return query.first()
 
-def abandon_session_invalid(user_id:int):
+
+def abandon_session_invalid(user_id: int):
     invalid_sessions = LoginSession.query.filter(and_(
         LoginSession.user_id == user_id,
         LoginSession.state == STATE_NEW,
@@ -83,17 +86,20 @@ def abandon_session_invalid(user_id:int):
         sess.abandon()
     return
 
-def terminate_session(name:str):
+
+def terminate_session(name: str):
     sess = LoginSession.query.filter_by(session_name=name).first()
     sess.terminate()
 
-def is_session_expired(name:str) -> bool:
+
+def is_session_expired(name: str) -> bool:
     sess = LoginSession.query.filter_by(session_name=name).first()
     if sess is None:
         return False
     return sess.is_expired()
 
-def save(model:LoginSession):
+
+def save(model: LoginSession):
     if model.created_at is None:
         model.created_at = datetime.now()
     db.session.add(model)

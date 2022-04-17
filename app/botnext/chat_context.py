@@ -1,17 +1,16 @@
 import importlib
 from datetime import datetime
 from sqlalchemy import orm
-from telegram import Bot
+from telegram import Message
 
-from .message import Message
-from app.bot.workflow.base import WorkFlow
+from app.botnext.workflow import WorkFlow
 from app.di import get_db
 
 db = get_db()
 
+
 class ChatContext(db.Model):
 
-    __table_args__ = {'extend_existing': True}
     __tablename__ = "bot_chat_context"
 
     id = db.Column("id", db.Integer, primary_key=True, nullable=False)
@@ -31,14 +30,23 @@ class ChatContext(db.Model):
         handler = getattr(mod, self.handler_builder["class_name"])
         self._handler = handler(*self.handler_builder["arguments"])
 
+    def __init__(self, context: str, workflow: WorkFlow, message: Message):
+        self.set_handler(workflow)
+        self.context = context
+        self.is_active = 1
+        self.telegram_userid = str(message.from_user.id)
+        self.telegram_username = str(message.from_user.username)
+        self.chat_id = str(message.chat.id)
+        pass
+
     def handler(self) -> WorkFlow:
-        return self._handler 
+        return self._handler
 
     def set_handler(self, handler: WorkFlow):
         self._handler = handler
 
-    def handle(self, bot: Bot, message: Message):
-        self._handler.process(bot, message)
+    def handle(self, message: Message):
+        self._handler.process(message)
 
         if self._handler.is_finish():
             self.is_active = 0
@@ -49,7 +57,7 @@ class ChatContext(db.Model):
         self.handler_builder = self._handler.serialize()
 
 
-def save(model:ChatContext):
+def save(model: ChatContext):
     if not model.created_at:
         model.created_at = datetime.now()
 
@@ -58,13 +66,13 @@ def save(model:ChatContext):
     db.session.add(model)
     db.session.commit()
 
+
 def find_active(telegram_userid: str, chat_id: str) -> ChatContext:
     return ChatContext.query.filter_by(telegram_userid=telegram_userid, chat_id=chat_id, is_active=1).first()
 
-def terminate_old_context(telegram_userid: str, chat_id: str):
-    db.session.query(ChatContext).filter(\
-        ChatContext.telegram_userid==telegram_userid, \
-        ChatContext.chat_id==chat_id, \
-        ChatContext.is_active==1).delete()
 
-    
+def terminate_old_context(telegram_userid: str, chat_id: str):
+    db.session.query(ChatContext).filter(
+        ChatContext.telegram_userid == telegram_userid,
+        ChatContext.chat_id == chat_id,
+        ChatContext.is_active == 1).delete()

@@ -6,6 +6,8 @@ from app.di import get_bot
 
 bot = get_bot()
 cli = AppGroup("background-task")
+
+
 @cli.command("telegram-clean-up-message")
 def clean_up_message():
     def handler(payload: dict):
@@ -17,11 +19,12 @@ def clean_up_message():
             "delay_time": <int>
         }
         """
-        if "delay_time" not in payload or payload["delay_time"] > 0:
-            time.sleep(payload["delay_time"]),
+        delay_time = 10
+        if "delay_time" in payload:
+            delay_time = payload["delay_time"]
+        time.sleep(delay_time)
         bot.delete_message(message_id=payload["message_id"], chat_id=payload["chat_id"])
         pass
 
     app.channel.consume("telegram_delete_message", handler)
     pass
-

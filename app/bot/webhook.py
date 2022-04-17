@@ -1,5 +1,7 @@
 from flask import Blueprint, make_response, request, current_app, abort
-
+from telegram import Message 
+from app.di import get_bot
+from rich import print
 from .disptacher import Distpatcher
 from .command import (
     help,
@@ -16,6 +18,7 @@ from .callbackquery import (
     map_spending_category
 )
 
+bot = get_bot()
 dispatcher = Distpatcher()
 
 dispatcher.register_command("help", help.handle)
@@ -30,6 +33,8 @@ dispatcher.register_command("tm", spending_thismonth.handle)
 
 dispatcher.register_callback("map_spending_category", map_spending_category.handle)
 
+
+
 bp = Blueprint("telegram", __name__)
 @bp.route("/telegram", methods=["POST",])
 def telegram():
@@ -38,7 +43,8 @@ def telegram():
         return abort(401)
 
     payload = request.get_json(force=True)
-    
+
+
     if payload == None:
         return make_response({"status": "Error"}, 400)
     dispatcher.dispatch(payload)

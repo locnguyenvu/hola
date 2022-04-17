@@ -1,4 +1,5 @@
 {
+    "telegram_bot.authentication_failed": "Bạn không có quyền ❗",
     "telegram_bot.command.help.desc_init_slg": "Đăng ký group chat ghi nhận chi tiêu",
     "telegram_bot.command.help.desc_tm": "Tóm tắt chi tiêu trong tháng",
     "telegram_bot.command.init_spending_log_group.success": "✔ Thiết lập thành công",
