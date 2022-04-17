@@ -1,6 +1,11 @@
 from __future__ import absolute_import
 from flask import Flask, make_response
 from flask_cors import CORS
+import sys
+import asyncio
+
+if sys.platform.startswith("win"):
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 def create_app():

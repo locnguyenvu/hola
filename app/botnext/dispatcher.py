@@ -1,6 +1,5 @@
 from app.di import get_bot
 from flask import current_app
-from typing import Callable
 from .callbackquery.base import CallbackQueryHandler
 from .chat_context import find_active as ctx_find_active, save as ctx_save
 from .command.base import CommandHandler

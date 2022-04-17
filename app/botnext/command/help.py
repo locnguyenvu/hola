@@ -1,6 +1,6 @@
 from app.i18n import t
 from telegram import Message
-from .base import CommandHandler
+from app.botnext.command.base import CommandHandler
 
 content = """
 /tm {spending_thismonth_instruct}

@@ -4,7 +4,7 @@ from app.botnext.telegram import Message
 from app.user import find_by_telegram_account
 from flask import current_app
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, LoginUrl, ParseMode
-from .base import CommandHandler
+from app.botnext.command.base import CommandHandler
 
 
 class LoginCommand(CommandHandler):

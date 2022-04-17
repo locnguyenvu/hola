@@ -1,6 +1,6 @@
 from app.util import dt
 from app.spending.log import find as spendinglog_find
-from .base import CommandHandler
+from app.botnext.command.base import CommandHandler
 from telegram import Message, ParseMode
 
 

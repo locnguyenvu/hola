@@ -1,10 +1,9 @@
 from .blueprint import *
-from .telegram_webhook import handle
+from . import telegram_webhook as _tw
 from flask import Blueprint
 
 telegram_webhook = Blueprint("telegram_webhook", __name__)
-telegram_webhook.add_url_rule("/telegram-next", methods=["POST", ], view_func=handle)
-
+telegram_webhook.add_url_rule("/telegram-next", methods=["POST", ], view_func=_tw.handle)
 
 
 def init_app(app):
