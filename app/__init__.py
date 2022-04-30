@@ -31,11 +31,10 @@ def create_app():
         from . import dbconfig
         dbconfig.load_dbconfig(app)
 
-        from . import auth, http, cli, bot
+        from . import auth, http, cli
         auth.init_app(app)
         http.init_app(app)
         cli.init_app(app)
-        bot.init_app(app)
 
     return app
 

@@ -34,8 +34,8 @@ class SpendingLogGroupChat(GroupChat):
             reply_mess = message.reply_text(sl.subject, reply_markup=reply_markup)
             app.channel.broadcast("telegram_delete_message", dict(message_id=reply_mess.message_id, chat_id=reply_mess.chat_id, delay_time=15))
         except ValueError:
-            message.delete()
             reply_mess = message.reply_text(t("telegram_bot.group_chat.spending_log.error_wrong_format"))
             app.channel.broadcast("telegram_delete_message", dict(message_id=reply_mess.message_id, chat_id=reply_mess.chat_id, delay_time=5))
+            message.delete()
             pass
     pass
