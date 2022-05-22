@@ -10,6 +10,8 @@ from .base import GroupChat
 class SpendingLogGroupChat(GroupChat):
 
     def _process(self, message: Message):
+        if message.text is None:
+            return
         try:
             sl = spending_log.new_from_chat_content(message.text)
             sl.telegram_message_id = message.message_id
@@ -34,7 +36,7 @@ class SpendingLogGroupChat(GroupChat):
             reply_mess = message.reply_text(sl.subject, reply_markup=reply_markup)
             app.channel.broadcast("telegram_delete_message", dict(message_id=reply_mess.message_id, chat_id=reply_mess.chat_id, delay_time=15))
         except ValueError:
-            reply_mess = message.reply_text(t("telegram_bot.group_chat.spending_log.error_wrong_format"))
+            reply_mess = message.bot.send_message(message.chat_id, t("telegram_bot.group_chat.spending_log.error_wrong_format"))
             app.channel.broadcast("telegram_delete_message", dict(message_id=reply_mess.message_id, chat_id=reply_mess.chat_id, delay_time=5))
             message.delete()
             pass

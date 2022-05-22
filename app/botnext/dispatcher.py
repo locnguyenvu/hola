@@ -36,7 +36,7 @@ class Dispatcher(object):
 
         if "message" in telegram_request:
             message = Message.de_json(telegram_request["message"], bot)
-            if message.is_command():
+            if message.text is not None and message.is_command():
                 if message.command() not in self.commands:
                     return
                 handler = self.commands[message.command()]
