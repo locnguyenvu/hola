@@ -3,14 +3,15 @@ from flask_jwt_extended import jwt_required
 
 import app.spending.tag as spending_tag
 
+
 @jwt_required()
 def index():
     global spending_tag
     if request.method == 'GET':
         row_set = spending_tag.Tag.query.all()
         data = list(map(lambda e: {
-            'id': e.id, 
-            'name': e.tag_name, 
+            'id': e.id,
+            'name': e.tag_name,
             'is_active': e.is_active
         }, row_set))
         return make_response({'status': 'ok', 'data': data})
@@ -20,6 +21,7 @@ def index():
             tag_name=params.get('tag_name')
         )
         return make_response({'status': 'ok', 'tag': {'tag_name': spending_tag.tag_name, 'id': spending_tag.id}})
+
 
 @jwt_required()
 def tag_log(tag_id):

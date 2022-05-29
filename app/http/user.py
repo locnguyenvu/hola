@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required
 
 from app.user import User
 
+
 @jwt_required()
 def index():
     data = list(map(lambda e: {
