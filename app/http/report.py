@@ -9,6 +9,7 @@ import app.report.spending
 from app.util import dt
 from .helper import response_error, response_success
 
+
 @jwt_required()
 def summary_by_month():
     period_str = request.args.get("timespan")
@@ -25,6 +26,7 @@ def investment_all():
     return make_response({
         "data": app.report.investment.overview()
     })
+
 
 @jwt_required()
 def spending_summary_by_interval():

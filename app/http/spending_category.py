@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required
 
 import app.spending.category as spending_category
 
+
 @jwt_required()
 def index():
     if request.method == "GET":
@@ -28,6 +29,7 @@ def index():
                 "display_name": category.display_name
             }
         })
+
 
 @jwt_required()
 def edit(id):

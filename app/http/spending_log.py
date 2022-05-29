@@ -7,18 +7,19 @@ import app.spending.category as spending_category
 import app.recommendation.spending_log_category as recommendation_spending_log_category
 from app import util
 
+
 @jwt_required()
 def index():
     timespan = None
-    if len(request.args.get("from_date")) > 0  and len(request.args.get("to_date")) > 0:
+    if len(request.args.get("from_date")) > 0 and len(request.args.get("to_date")) > 0:
         date_format = "%Y-%m-%d %H:%M:%S"
-        timespan=(
-            datetime.strptime(request.args.get("from_date"), date_format), 
+        timespan = (
+            datetime.strptime(request.args.get("from_date"), date_format),
             datetime.strptime(request.args.get("to_date"), date_format)
         )
 
     if timespan is None:
-        if  request.args.get("timerange") is not None:
+        if request.args.get("timerange") is not None:
             timespan = util.dt.time_range_from_text(request.args.get("timerange"))
         elif request.args.get("from_month") is not None and request.args.get("to_month") is not None:
             from_timespan = util.dt.time_range_from_text(request.args.get("from_month"))
@@ -26,7 +27,6 @@ def index():
             timespan = (from_timespan[0], to_timespan[1],)
         if timespan is None or len(timespan) == 0:
             timespan = util.dt.time_range_from_text("today")
-    
     filters = {
         "from_date": timespan[0],
         "to_date": timespan[1],
@@ -45,10 +45,11 @@ def index():
             "created_at": e.created_at.strftime("%Y-%m-%d %H:%M:%S")
         }, spending_log.find(filters, order_by_column='id', order_type="desc")))})
 
+
 @jwt_required()
 def detail(id):
     log = spending_log.find_id(id)
-    if (request.method == 'GET') : 
+    if (request.method == 'GET'):
         return make_response({
             'status': 'ok',
             'data': {
@@ -73,6 +74,7 @@ def detail(id):
             log.transaction_type = edit_payload.get("transaction_type")
         spending_log.save(log)
         return make_response({'status': 'ok'})
+
 
 @jwt_required()
 def split(id):
