@@ -104,6 +104,10 @@ class strings(object):
                 carry = carry * 1000_000_000
         return carry
 
+    @classmethod
+    def is_numeric(cls, input: str) -> bool:
+        match = re.match('^\d+(k|M|G)*$', input)
+        return match is not None
 
 class numeric(object):
 

@@ -13,6 +13,7 @@ setup(
         "Flask-JWT-Extended",
         "Flask-SQLAlchemy",
         "flask-cors",
+        "python-dateutil",
         "python-dotenv",
         "python-telegram-bot",
         "psycopg2-binary",

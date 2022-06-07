@@ -1,7 +1,7 @@
 from app.di import get_bot
 from flask import current_app
 from .callbackquery.base import CallbackQueryHandler
-from .chat_context import find_active as ctx_find_active, save as ctx_save
+from .chat_context import find_active as ctx_find_active, save as ctx_save, terminate_old_context as ctx_terminal_old_context
 from .command.base import CommandHandler
 from .groupchat.spending_log import SpendingLogGroupChat
 from .telegram import Message, CallbackQuery
@@ -29,6 +29,8 @@ class Dispatcher(object):
 
         if "callback_query" in telegram_request:
             callback_query = CallbackQuery.de_json(telegram_request["callback_query"], bot)
+            if callback_query is None:
+                return
             if callback_query.function_name() in self.callback_queries:
                 handler = self.callback_queries[callback_query.function_name()]
                 handler.execute(callback_query)
@@ -36,9 +38,12 @@ class Dispatcher(object):
 
         if "message" in telegram_request:
             message = Message.de_json(telegram_request["message"], bot)
+            if message is None:
+                return
             if message.text is not None and message.is_command():
                 if message.command() not in self.commands:
                     return
+                ctx_terminal_old_context(str(message.from_user.id), str(message.chat.id))
                 handler = self.commands[message.command()]
                 handler.execute(message)
                 return
@@ -52,7 +57,6 @@ class Dispatcher(object):
                 if chat_ctx is not None:
                     chat_ctx.handle(message)
                     ctx_save(chat_ctx)
-
             return
 
     pass
