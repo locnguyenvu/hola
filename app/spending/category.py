@@ -76,6 +76,12 @@ def list_all():
 
 
 def save(model: Category):
+    if model.created_at is None:
+        model.created_at = datetime.now()
     model.updated_at = datetime.now()
     db.session.add(model)
     db.session.commit()
+
+
+def list_limited():
+    return Category.query.where(Category.monthly_limit > 0).all()

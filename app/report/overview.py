@@ -4,7 +4,7 @@ from app.investment.fund_certificate_subscription import FundCertificateSubscrip
 from app.spending.log import Log as SpendingLog
 
 def by_month(month:str):
-    timerange = util.dt.time_range_from_text(month)
+    timerange = util.dt.timerange_fromtext(month)
 
     total_income = 0
     incomes = IncomeLog.query.filter(IncomeLog.created_at.between(*timerange)).all() 

@@ -10,7 +10,7 @@ class SpendingThisMonthCommand(CommandHandler):
         return True
 
     def _process(self, message: Message):
-        timespan = dt.time_range_from_text(dt.CURRENT_MONTH)
+        timespan = dt.timerange_fromtext(dt.CURRENT_MONTH)
         logs = spendinglog_find(dict(from_date=timespan[0], to_date=timespan[1]))
 
         debit_amount = 0

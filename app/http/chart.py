@@ -9,13 +9,13 @@ import app.spending.category as spending_category
 @jwt_required()
 def expense_by_category():
     if request.args.get('timerange') is not None:
-        timespan = dt.time_range_from_text(request.args.get('timerange'))
+        timespan = dt.timerange_fromtext(request.args.get('timerange'))
     elif request.args.get("from_month") is not None and request.args.get("to_month") is not None:
-        from_timespan = dt.time_range_from_text(request.args.get("from_month"))
-        to_timespan = dt.time_range_from_text(request.args.get("to_month"))
+        from_timespan = dt.timerange_fromtext(request.args.get("from_month"))
+        to_timespan = dt.timerange_fromtext(request.args.get("to_month"))
         timespan = (from_timespan[0], to_timespan[1],)
     else:
-        timespan = dt.time_range_from_text('current_month')
+        timespan = dt.timerange_fromtext('current_month')
 
     report_logs = spending_log.find({
         "from_date": timespan[0],
@@ -59,11 +59,11 @@ def expense_by_month():
     months = 6
     starting_month = None
     if request.args.get('months') is not None:
-        months = dt.time_range_from_text(request.args.get('timerange'))
+        months = dt.timerange_fromtext(request.args.get('timerange'))
     if request.args.get('starting_month') is not None:
         starting_month = request.args.get('starting_month')
 
-    timespan = dt.time_range_in_past_month(months, starting_month=starting_month)
+    timespan = dt.timerange_prevmonth(months, starting_month=starting_month)
 
     report_logs = spending_log.find({
         "from_date": timespan[0],
