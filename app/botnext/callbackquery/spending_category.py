@@ -133,7 +133,7 @@ class EditSpendingCategory(CallbackQueryHandler):
 
         message.bot.send_message(chat_id=message.chat.id, text=t("telegram_bot.callbackquery.edit_spending_category_promp_1"))
 
-        wflow = AddSpendingCategoryWorkFlow(None, None, None)
+        wflow = EditSpendingCategoryWorkFlow(None, None, None)
         ctx = ChatContext(__name__, wflow, message)
         ctx_save(ctx)
         pass
