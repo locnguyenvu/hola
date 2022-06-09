@@ -84,4 +84,4 @@ def save(model: Category):
 
 
 def list_limited():
-    return Category.query.where(Category.monthly_limit > 0).all()
+    return Category.query.where(Category.monthly_limit > 0).order_by(Category.monthly_limit.desc()).all()

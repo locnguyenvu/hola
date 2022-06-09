@@ -35,7 +35,7 @@ def summary_by_category(timespan: tuple) -> dict:
     }
 
 
-def monthlytotals_bycategoryid(start_time: datetime, category_id: int):
+def monthlytotals_bycategoryid(start_time: datetime, category_id: int) -> dict:
     query = text(
         "SELECT to_char(sl.created_at, 'YYYY-MM') as pmonth, sum(sl.amount) as total "
         "FROM spending_log as sl "
@@ -48,10 +48,7 @@ def monthlytotals_bycategoryid(start_time: datetime, category_id: int):
         "category_id": category_id,
     }).fetchall()
 
-    resultset = []
+    resultset = {}
     for row in dataset:
-        resultset.append({
-            "month": row["pmonth"],
-            "total": row["total"],
-        })
+        resultset[row["pmonth"]] = row["total"]
     return resultset

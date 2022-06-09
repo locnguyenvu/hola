@@ -1,4 +1,6 @@
 from flask.cli import AppGroup
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
 
 import app.util as util
 import app.channel
@@ -29,20 +31,40 @@ def i18n():
 
 @cli.command("report")
 def report():
+    monthrange = 6
     from rich import print
-    timerange = util.dt.timerange_prevmonth(6)
+    timerange = util.dt.timerange_prevmonth(monthrange)
 
-    groupbymonth = {}
+    milestone = timerange[0]
+    nowc = datetime.now().strftime("%Y-%m")
+    timerangekeys = [milestone.strftime("%Y-%m")]
+    while milestone.strftime("%Y-%m") != nowc:
+        milestone = milestone + relativedelta(months=1)
+        timerangekeys.append(milestone.strftime("%Y-%m"))
+
+    groupbytimeindex = {}
     limitcate = spending_category.list_limited()
     for cat in limitcate:
         result = report_spending.monthlytotals_bycategoryid(timerange[0], cat.id)
-        for elem in result:
-            if elem["month"] not in groupbymonth.keys():
-                groupbymonth[elem["month"]] = {}
-            groupbymonth[elem["month"]][cat.id] = elem["total"]
+        for timeindex in timerangekeys:
+            if timeindex not in groupbytimeindex:
+                groupbytimeindex[timeindex] = []
+            if timeindex in result.keys():
+                groupbytimeindex[timeindex].append(result[timeindex])
+                continue
+            groupbytimeindex[timeindex].append(0)
 
-    for cat in limitcate:
-        for key in groupbymonth.keys():
-            if cat.id not in groupbymonth[key].keys():
-                groupbymonth[key][cat.id] = 0
-    print(groupbymonth)
+    filleddata = []
+    for i, v in enumerate(limitcate):
+        element = {
+            "name": v.display_name,
+            "data": []
+        }
+        for fil in groupbytimeindex.values():
+            element["data"].append(fil[i])
+
+        filleddata.append(element)
+    print({
+        "key": timerangekeys,
+        "data": filleddata,
+    })
