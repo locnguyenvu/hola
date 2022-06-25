@@ -9,7 +9,7 @@ class dt(object):
     CURRENT_MONTH = "current_month"
 
     @classmethod
-    def time_range_from_text(cls, description) -> tuple:
+    def timerange_fromtext(cls, description) -> tuple:
         if description == cls.TODAY:
             carrytime = datetime.today()
             return (
@@ -34,7 +34,7 @@ class dt(object):
         return tuple()
 
     @classmethod
-    def time_range_in_past_month(cls, months, starting_month=None) -> tuple:
+    def timerange_prevmonth(cls, months, starting_month=None) -> tuple:
         if starting_month is not None and re.match(r"^\d{4}\-\d{1,2}$", starting_month) is not None:
             year, month = map(lambda e: int(e), starting_month.split("-"))
             start_point = datetime(year, month, 1)
@@ -47,8 +47,8 @@ class dt(object):
             target_month = 12 - abs(target_month)
             target_year -= 1
 
-        startime = cls.time_range_from_text(f"{target_year}-{target_month}")
-        endtime = cls.time_range_from_text(f"{start_point.year}-{start_point.month}")
+        startime = cls.timerange_fromtext(f"{target_year}-{target_month}")
+        endtime = cls.timerange_fromtext(f"{start_point.year}-{start_point.month}")
         return (startime[0], endtime[1])
 
 
@@ -106,8 +106,9 @@ class strings(object):
 
     @classmethod
     def is_numeric(cls, input: str) -> bool:
-        match = re.match('^\d+(k|M|G)*$', input)
+        match = re.match(r'^\d+(k|M|G)*$', input)
         return match is not None
+
 
 class numeric(object):
 

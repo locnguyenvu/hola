@@ -24,6 +24,7 @@ web_api.add_url_rule("/telegram-login", methods=["GET"], view_func=auth.telegram
 web_api.add_url_rule("/me", methods=["GET"], view_func=auth.me)
 web_api.add_url_rule("/chart/expense-by-category", view_func=chart.expense_by_category)
 web_api.add_url_rule("/chart/expense-by-month", view_func=chart.expense_by_month)
+web_api.add_url_rule("/chart/watch-monthly-expense", view_func=chart.watch_monthlyexpense)
 web_api.add_url_rule("/health", view_func=health_check)
 web_api.add_url_rule("/report/by-month", view_func=report.summary_by_month)
 web_api.add_url_rule("/report/investment", view_func=report.investment_all)
