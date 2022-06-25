@@ -3,11 +3,12 @@ from app.income.log import Log as IncomeLog
 from app.investment.fund_certificate_subscription import FundCertificateSubscription
 from app.spending.log import Log as SpendingLog
 
-def by_month(month:str):
+
+def by_month(month: str):
     timerange = util.dt.timerange_fromtext(month)
 
     total_income = 0
-    incomes = IncomeLog.query.filter(IncomeLog.created_at.between(*timerange)).all() 
+    incomes = IncomeLog.query.filter(IncomeLog.created_at.between(*timerange)).all()
     for inc in incomes:
         total_income += inc.amount
 

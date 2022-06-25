@@ -1,7 +1,10 @@
 from flask import request, make_response
 from flask_jwt_extended import jwt_required
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
 
 from app.util import dt
+import app.report.spending as report_spending
 import app.spending.log as spending_log
 import app.spending.category as spending_category
 
@@ -83,4 +86,44 @@ def expense_by_month():
         "total": total,
         "from_month": timespan[0].strftime('%Y-%m'),
         "to_month": timespan[1].strftime('%Y-%m')
+    })
+
+
+@jwt_required()
+def watch_monthlyexpense():
+    monthrange = 6
+    timerange = dt.timerange_prevmonth(monthrange)
+
+    milestone = timerange[0]
+    nowc = datetime.now().strftime("%Y-%m")
+    timerangekeys = [milestone.strftime("%Y-%m")]
+    while milestone.strftime("%Y-%m") != nowc:
+        milestone = milestone + relativedelta(months=1)
+        timerangekeys.append(milestone.strftime("%Y-%m"))
+
+    groupbytimeindex = {}
+    limitcate = spending_category.list_limited()
+    for cat in limitcate:
+        result = report_spending.monthlytotals_bycategoryid(timerange[0], cat.id)
+        for timeindex in timerangekeys:
+            if timeindex not in groupbytimeindex:
+                groupbytimeindex[timeindex] = []
+            if timeindex in result.keys():
+                groupbytimeindex[timeindex].append(result[timeindex])
+                continue
+            groupbytimeindex[timeindex].append(0)
+
+    filleddata = []
+    for i, v in enumerate(limitcate):
+        element = {
+            "name": v.display_name,
+            "data": []
+        }
+        for fil in groupbytimeindex.values():
+            element["data"].append(fil[i])
+
+        filleddata.append(element)
+    return make_response({
+        "key": timerangekeys,
+        "data": filleddata,
     })
